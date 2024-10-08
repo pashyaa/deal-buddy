@@ -16,9 +16,9 @@ const Dashboard = () => {
         <Grid item xs={9}>
           <MyAppBar></MyAppBar>
           <Routes>
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/orders" element={<Order />} />
-          </Routes>
+        <Route path="/dashboard/products" element={<ProductList />}  exact />
+        <Route path="/dashboard/orders" element={<Order />}  exact />
+      </Routes> 
         </Grid>
       </Grid>
     </Container>
