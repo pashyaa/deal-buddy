@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -20,20 +20,16 @@ const MenuItems = () => {
       <MenuItem>
         <Typography textAlign="center">Contact</Typography>
       </MenuItem>
-      <MenuItem component={Link} to="/auth">
-        <Typography textAlign="center">Login</Typography>
-      </MenuItem>
     </div>
   );
 };
 
 export default function MenuAppBar() {
-  const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAuth(event.target.checked);
-  };
+  const navigate = useNavigate();
+  
+  // Check if the user is authenticated
+  const isAuthenticated = !!localStorage.getItem('token');
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -41,6 +37,11 @@ export default function MenuAppBar() {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/auth');
   };
 
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -88,6 +89,11 @@ export default function MenuAppBar() {
               onClose={handleClose}
             >
               <MenuItems />
+              {!isAuthenticated && (
+                <MenuItem component={Link} to="/auth" onClick={handleClose}>
+                  <Typography textAlign="center">Login</Typography>
+                </MenuItem>
+              )}
             </Menu>
           )}
           {isDesktop && (
@@ -98,9 +104,15 @@ export default function MenuAppBar() {
               <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
                 About
               </Button>
-              <Button component={Link} to="/auth" sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
-                Login
-              </Button>
+              {isAuthenticated ? (
+                <Button onClick={handleLogout} sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
+                  Logout
+                </Button>
+              ) : (
+                <Button component={Link} to="/auth" sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
+                  Login
+                </Button>
+              )}
             </div>
           )}
         </Toolbar>

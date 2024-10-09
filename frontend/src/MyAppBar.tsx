@@ -8,7 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import MenuBar from './MenuBar';
 import ProductList from './ProductList';
 import Order from './Orders';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 
 const NAVIGATION = [
   {
@@ -23,14 +24,26 @@ const NAVIGATION = [
 
 export default function ButtonAppBar() {
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); 
 
   const handleToggle = () => {
     setOpen(!open);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/auth');
+  };
+  
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Box sx={{ width: '100%', display: 'flex', flexGrow: 1 }}>
-      <AppBar position="fixed">
+      <AppBar position="fixed" sx={{ bgcolor: '#F5F5DC' }}> {/* Beige background color */}
         <Toolbar>
           <IconButton
             size="large"
@@ -40,9 +53,20 @@ export default function ButtonAppBar() {
             sx={{ mr: 2 }}
             onClick={handleToggle}
           >
-            <Button color="inherit">Menu</Button>
+            <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>Menu</Button>
           </IconButton>
-          <Button color="inherit">Login</Button>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: 24 }}>
+            <span style={{
+              backgroundImage: 'linear-gradient(to right, #ff69b4, #ffa07a)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              <Link to="/" onClick={handleClose}>DEAL BUDDY</Link>
+            </span>
+          </Typography>
+          <Button color="inherit" onClick={handleLogout} sx={{ ml: 'auto',color: 'black', fontSize: 18, fontWeight: 'bold' }}>
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       <MenuBar open={open} onClose={handleToggle} navigation={NAVIGATION} />
