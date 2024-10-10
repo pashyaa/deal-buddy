@@ -7,7 +7,7 @@ import { Box, Grid, Container, AppBar, Toolbar } from '@mui/material';
 const DashboardLayout = () => {
   return (
     <Box>
-      <div className="app-container" style={{ overflowY: 'hidden', height: '100vh' }}>
+      
         <Container maxWidth="lg" sx={{ mt: 64, overflow: 'hidden' }}> 
           <Grid container spacing={2}>
             <Grid item xs={3} sx={{ mt: -64 }}>
@@ -19,7 +19,7 @@ const DashboardLayout = () => {
             </Grid>
           </Grid>
         </Container>
-      </div>
+    
     </Box>
   );
 };

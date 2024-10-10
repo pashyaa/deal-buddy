@@ -5,8 +5,8 @@ import Auth from './Auth';
 import Createaccount from './Createaccount';
 import MainLayout from './MainLayout';
 import DashboardLayout from './DashboardLayout';
-import ProductList from './ProductList';
-import Order from './Orders';
+import Users from './Users';
+import Coupons from './Coupons';
 import Vouchers from './Vouchers';
 import Dashboard from './Dashboard';
 import ProtectedRoute from './ProtectedRoute'; // Import the ProtectedRoute component
@@ -26,18 +26,18 @@ const App = () => {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/*" element={<Dashboard />}>
             <Route 
-              path="products" 
+              path="users" 
               element={
                 <ProtectedRoute>
-                  <ProductList />
+                  <Users />
                 </ProtectedRoute>
               } 
             />
             <Route 
-              path="orders" 
+              path="coupons" 
               element={
                 <ProtectedRoute>
-                  <Order />
+                  <Coupons />
                 </ProtectedRoute>
               } 
             />
