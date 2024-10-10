@@ -1,15 +1,15 @@
 import React from 'react';
-import './App.css';
-import Home from './Home';
-import Auth from './Auth';
-import Createaccount from './Createaccount';
-import MainLayout from './MainLayout';
-import DashboardLayout from './DashboardLayout';
-import Users from './Users';
-import Coupons from './Coupons';
-import Vouchers from './Vouchers';
-import Dashboard from './Dashboard';
-import ProtectedRoute from './ProtectedRoute'; // Import the ProtectedRoute component
+import './styles/App.css';
+import Home from './pages/Home';
+import Auth from './components/Auth';
+import Createaccount from './pages/Createaccount';
+import MainLayout from './components/MainLayout';
+import DashboardLayout from './dashboard/DashboardLayout';
+import Users from './dashboard/Users';
+import Coupons from './dashboard/Coupons';
+import Vouchers from './dashboard/Vouchers';
+import Dashboard from './dashboard/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const App = () => {

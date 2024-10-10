@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import MenuBar from './MenuBar';
-import MyAppBar from './MyAppBar';
+import MenuBar from '../components/MenuBar';
+import MyAppBar from '../components/MyAppBar';
 import { Box, Grid, Container, AppBar, Toolbar } from '@mui/material';
 
 const DashboardLayout = () => {

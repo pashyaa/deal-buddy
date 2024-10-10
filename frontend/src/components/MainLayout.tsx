@@ -1,4 +1,4 @@
-import  AppBar  from './Material Component/Appbar';
+import  AppBar from '../components/Appbar'
 import { Outlet } from 'react-router-dom';
 
 const MainLayout: React.FC = () => {

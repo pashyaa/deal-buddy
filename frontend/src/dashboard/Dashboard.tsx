@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route, Routes, Navigate, Outlet } from 'react-router-dom';
 import Users from './Users';
-import MenuBar from './MenuBar';
+import MenuBar from '../components/MenuBar';
 import Coupons from './Coupons';
-import MyAppBar from './MyAppBar';
+import MyAppBar from '../components/MyAppBar';
 import { Box, Grid, Container, AppBar, Toolbar } from '@mui/material';
 import { useState, useEffect } from 'react';
 
@@ -36,8 +36,8 @@ const Dashboard = () => {
         <Grid item xs={9}>
           <MyAppBar />
           <Routes>
-            <Route path="/dashboard/users" element={<Users/>} exact />
-            <Route path="/dashboard/coupons" element={<Coupons />} exact />
+            <Route path="/dashboard/users" element={<Users/>} />
+            <Route path="/dashboard/coupons" element={<Coupons />} />
           </Routes>
         </Grid>
       </Grid>

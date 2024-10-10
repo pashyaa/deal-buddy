@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Button, Typography, Table, TableHead, TableRow, TableCell, TableBody, TextField, FormControl, FormLabel, Container, Box, Tabs, Tab } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import MenuBar from './MenuBar';
+import MenuBar from '../components/MenuBar';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
