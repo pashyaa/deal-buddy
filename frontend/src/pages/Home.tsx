@@ -1,34 +1,75 @@
 import React from 'react';
-import { Paper, Grid, Box } from '@mui/material';
+import { Box, Typography, Grid, Button, Container } from '@mui/material';
+import featureImage1 from '../assets/images/placeholder-1.png';
+import featureImage2 from '../assets/images/placeholder-2.png';
+import featureImage3 from '../assets/images/placeholder-3.png';
 
-const Home = () => {
+const Home: React.FC = () => {
   return (
     <div>
-      <Grid
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        style={{ minHeight: '100vh' }}
-      >
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Paper variant="outlined" sx={{ maxWidth: 800, p: 2, backgroundColor: '#F5F5DC' }}>
-              <h1 style={{
-                fontWeight: 'bold',
-                fontSize: '36px',
-                backgroundImage: 'linear-gradient(to right, #ff69b4, #ffa07a)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                Welcome to DealBuddy!
-              </h1>
-              <p>Get the best coupons and cashback offers here.</p>
-            </Paper>
-          </Box>
+      {/* Hero Section */}
+      <Box sx={{ bgcolor: '#f5f5f5', py: 8, textAlign: 'center' }}>
+        <Typography variant="h2" gutterBottom>
+          Welcome to DealBuddy
+        </Typography>
+        <Typography variant="h5" paragraph>
+          Find the best deals, coupons, and offers on online shopping!
+        </Typography>
+        <Button variant="contained" color="primary" size="large">
+          Get Started
+        </Button>
+      </Box>
+
+      {/* Feature Section */}
+      <Container sx={{ py: 6 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Why Choose DealBuddy?
+        </Typography>
+        <Grid container spacing={4} justifyContent="center">
+          <Grid item xs={12} sm={6} md={4}>
+            <Box textAlign="center">
+              <img src={featureImage1} alt="Feature 1" style={{ width: '100%' }} />
+              <Typography variant="h6" gutterBottom>
+                Best Deals
+              </Typography>
+              <Typography>
+                Access the most exclusive deals across multiple platforms with ease.
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Box textAlign="center">
+              <img src={featureImage2} alt="Feature 2" style={{ width: '100%' }} />
+              <Typography variant="h6" gutterBottom>
+                Verified Coupons
+              </Typography>
+              <Typography>
+                Get verified and updated coupons, ensuring you always save on purchases.
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Box textAlign="center">
+              <img src={featureImage3} alt="Feature 3" style={{ width: '100%' }} />
+              <Typography variant="h6" gutterBottom>
+                Easy to Use
+              </Typography>
+              <Typography>
+                Our user-friendly interface helps you find deals quickly and efficiently.
+              </Typography>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
+      </Container>
+
+      {/* Footer */}
+      <Box sx={{ bgcolor: '#333', color: '#fff', py: 3, mt: 6 }}>
+        <Container>
+          <Typography variant="body2" align="center">
+            © {new Date().getFullYear()} DealBuddy. All rights reserved.
+          </Typography>
+        </Container>
+      </Box>
     </div>
   );
 };
