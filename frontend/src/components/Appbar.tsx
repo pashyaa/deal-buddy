@@ -10,6 +10,7 @@ import Menu from '@mui/material/Menu';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 
 const MenuItems = () => {
   return (
@@ -26,6 +27,7 @@ const MenuItems = () => {
 
 export default function MenuAppBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [accountMenuEl, setAccountMenuEl] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   
   // Check if the user is authenticated
@@ -35,13 +37,19 @@ export default function MenuAppBar() {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleAccountMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAccountMenuEl(event.currentTarget);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
+    setAccountMenuEl(null);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/auth');
+    handleClose();
   };
 
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -72,12 +80,71 @@ export default function MenuAppBar() {
               <Link to="/" onClick={handleClose}>DEAL BUDDY</Link>
             </span>
           </Typography>
+
+          {/* Display About and Contact buttons on Desktop */}
+          {isDesktop && (
+            <div>
+              <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
+                Contact
+              </Button>
+              <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
+                About
+              </Button>
+            </div>
+          )}
+
+         
+
+          
+          {isAuthenticated ? (
+            <>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls="menu-account"
+                aria-haspopup="true"
+                onClick={handleAccountMenu}
+                color="inherit"
+                sx={{ color: 'black' }}  
+              >
+                <AccountCircle sx={{ fontSize: 40 }} />  
+              </IconButton>
+              <Menu
+                id="menu-account"
+                anchorEl={accountMenuEl}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(accountMenuEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>
+                  <Link to="/dashboard/users" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Profile
+                  </Link>
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Button component={Link} to="/auth" sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
+              Login
+            </Button>
+          )}
+
           {isMobile && (
             <Menu
               id="menu-appbar"
               anchorEl={anchorEl}
               anchorOrigin={{
-                vertical: 'top',
+                vertical: 'bottom',
                 horizontal: 'right',
               }}
               keepMounted
@@ -87,6 +154,7 @@ export default function MenuAppBar() {
               }}
               open={Boolean(anchorEl)}
               onClose={handleClose}
+              
             >
               <MenuItems />
               {!isAuthenticated && (
@@ -95,25 +163,6 @@ export default function MenuAppBar() {
                 </MenuItem>
               )}
             </Menu>
-          )}
-          {isDesktop && (
-            <div>
-              <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
-                Contact
-              </Button>
-              <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
-                About
-              </Button>
-              {isAuthenticated ? (
-                <Button onClick={handleLogout} sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
-                  Logout
-                </Button>
-              ) : (
-                <Button component={Link} to="/auth" sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
-                  Login
-                </Button>
-              )}
-            </div>
           )}
         </Toolbar>
       </AppBar>

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { AuthProvider, AuthResponse, AppProvider, SignInPage, SupportedAuthProvider } from '@toolpad/core';
 import { useTheme } from '@mui/material/styles';
-import { Paper, Grid, Box, Container, CssBaseline, Link } from '@mui/material';
+import { Paper, Grid, Box, Container, CssBaseline } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
 const providers: AuthProvider[] = [
   {
     id: 'credentials' as SupportedAuthProvider,
@@ -70,7 +70,7 @@ export default function NotificationsSignInPageError() {
           <SignInPage signIn={(provider, formData) => signIn(provider, formData, navigate)} providers={providers} />
           <Grid container justifyContent="center">
             <Grid item>
-              <p>Don't have an account? <Link href="/register">Register now!</Link></p>
+              <p>Don't have an account? <Link to="/register">Register now!</Link></p>
             </Grid>
           </Grid>
         </AppProvider>

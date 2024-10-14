@@ -1,10 +1,15 @@
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Paper, Grid, Box, Container, CssBaseline, Link, TextField, Button } from '@mui/material';
+import { Paper, Grid, Container, CssBaseline, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface RegistrationFormData {
+  firstName: string;
+  lastName: string;
   email: string;
+  mobile: string;
+  country: string;
   password: string;
   confirmPassword: string;
 }
@@ -12,7 +17,7 @@ interface RegistrationFormData {
 const registration = async (formData: RegistrationFormData) => {
   try {
     console.log(process.env.REACT_APP_API_URL);
-    const response = await fetch(process.env.REACT_APP_API_URL +'/register', {
+    const response = await fetch(process.env.REACT_APP_API_URL + '/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,21 +41,46 @@ export default function Createaccount() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState<RegistrationFormData>({
+    firstName: '',
+    lastName: '',
     email: '',
+    mobile: '',
+    country: '',
     password: '',
     confirmPassword: '',
   });
   const [errors, setErrors] = React.useState({
+    firstName: '',
+    lastName: '',
     email: '',
+    mobile: '',
+    country: '',
     password: '',
     confirmPassword: '',
   });
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { email: '', password: '', confirmPassword: '' };
+    const newErrors = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      mobile: '',
+      country: '',
+      password: '',
+      confirmPassword: '',
+    };
 
-    // Basic email validation
+    if (!formData.firstName) {
+      newErrors.firstName = 'First Name is required.';
+      isValid = false;
+    }
+
+    if (!formData.lastName) {
+      newErrors.lastName = 'Last Name is required.';
+      isValid = false;
+    }
+
     if (!formData.email) {
       newErrors.email = 'Email is required.';
       isValid = false;
@@ -59,7 +89,16 @@ export default function Createaccount() {
       isValid = false;
     }
 
-    // Password validation
+    if (!formData.mobile) {
+      newErrors.mobile = 'Mobile number is required.';
+      isValid = false;
+    }
+
+    if (!formData.country) {
+      newErrors.country = 'Country is required.';
+      isValid = false;
+    }
+
     if (!formData.password) {
       newErrors.password = 'Password is required.';
       isValid = false;
@@ -68,7 +107,6 @@ export default function Createaccount() {
       isValid = false;
     }
 
-    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Confirm Password is required.';
       isValid = false;
@@ -94,61 +132,110 @@ export default function Createaccount() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <CssBaseline />
-      <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#F5F5DC' }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <h2>Registration Form</h2>
-          </Grid>
-          <Grid item xs={12}>
+    <Container maxWidth="sm" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 50px)' }}>
+    <CssBaseline />
+    <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#F5F5DC', width: '100%', height: '650px' }}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <h2 style={{ marginBottom: '10px' }}>Registration Form</h2> 
+        </Grid>
+        <Grid item xs={12} container spacing={1}>
+          <Grid item xs={6}>
             <TextField
-              label="Email"
-              type="email"
+              label="First Name"
               fullWidth
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              error={!!errors.email}
-              helperText={errors.email}
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              error={!!errors.firstName}
+              helperText={errors.firstName}
+              sx={{ marginBottom: 0.5 }} 
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
-              label="Password"
-              type="password"
+              label="Last Name"
               fullWidth
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              error={!!errors.password}
-              helperText={errors.password}
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              error={!!errors.lastName}
+              helperText={errors.lastName}
+              sx={{ marginBottom: 0.5 }} 
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Confirm Password"
-              type="password"
-              fullWidth
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
-              Register
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <Grid container justifyContent="center">
-              <Grid item>
-                <p> Already have an account? <Link href="/auth">Login here!</Link>
-                </p>
-              </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            error={!!errors.email}
+            helperText={errors.email}
+            sx={{ marginBottom: 0.5 }} 
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Mobile Number"
+            fullWidth
+            value={formData.mobile}
+            onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+            error={!!errors.mobile}
+            helperText={errors.mobile}
+            sx={{ marginBottom: 0.5 }} 
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Country"
+            fullWidth
+            value={formData.country}
+            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+            error={!!errors.country}
+            helperText={errors.country}
+            sx={{ marginBottom: 0.5 }} 
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            error={!!errors.password}
+            helperText={errors.password}
+            sx={{ marginBottom: 0.5 }} 
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword}
+            sx={{ marginBottom: 0.5 }} 
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+            Register
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container justifyContent="center">
+            <Grid item>
+              <p>Already have an account? <Link to="/auth">Login here!</Link></p>
             </Grid>
           </Grid>
         </Grid>
-      </Paper>
-    </Container>
+      </Grid>
+    </Paper>
+  </Container>
+  
   );
 }

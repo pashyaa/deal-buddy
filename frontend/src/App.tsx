@@ -1,7 +1,7 @@
 import React from 'react';
 import './styles/App.css';
 import Home from './pages/Home';
-import Auth from './components/Auth';
+import Auth from './pages/Auth';
 import Createaccount from './pages/Createaccount';
 import MainLayout from './components/MainLayout';
 import DashboardLayout from './dashboard/DashboardLayout';

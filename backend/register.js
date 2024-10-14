@@ -3,6 +3,12 @@ const app = express();
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+
+const loggedUsers = []; 
+
+
+const SECRET_KEY = 'Vedant@123'; 
 
 const db = mysql.createPool({
   host: '127.0.0.1',
@@ -10,15 +16,29 @@ const db = mysql.createPool({
   password: 'Vedant@123',
   database: 'demo'
 });
-const createUserTableQuery = `CREATE TABLE IF NOT EXISTS users (
-  id INT AUTO_INCREMENT,
-  email VARCHAR(255) NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-)`;
+
+const dropUserTableQuery = `
+  DROP TABLE IF EXISTS users;
+`;
+
+const createUserTableQuery = `
+  CREATE TABLE users (
+    id INT AUTO_INCREMENT,
+    firstName VARCHAR(255) NOT NULL,
+    lastName VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    mobile VARCHAR(20) NOT NULL,
+    country VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+  );
+`;
 
 async function createTable() {
   try {
+    await db.execute(dropUserTableQuery);
+    console.log('Table dropped successfully');
+
     await db.execute(createUserTableQuery);
     console.log('Table created successfully');
   } catch (error) {
@@ -27,10 +47,12 @@ async function createTable() {
 }
 
 createTable();
+
 app.use(express.json());
 app.use(cors());
+
 app.post('/register', async (req, res) => {
-  const { email, password, confirmPassword } = req.body;
+  const { firstName, lastName, email, mobile, country, password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) {
     return res.status(400).json({ error: 'Passwords do not match.' });
@@ -38,8 +60,11 @@ app.post('/register', async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const query = `INSERT INTO users (email, password) VALUES (?, ?)`;
-  const values = [email, hashedPassword];
+  const query = `
+    INSERT INTO users (firstName, lastName, email, mobile, country, password)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+  const values = [firstName, lastName, email, mobile, country, hashedPassword];
 
   try {
     await db.execute(query, values);
@@ -67,25 +92,47 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    const jwt = require('jsonwebtoken');
+  
+    const token = jwt.sign({ id: user[0].id }, SECRET_KEY, {
+      expiresIn: '1h',
+    });
 
-    process.env.SECRET_KEY = 'Vedant@123';
-    
-    function generateToken(id) {
-      const token = jwt.sign({ id }, process.env.SECRET_KEY, {
-        expiresIn: '1h',
+   
+    const loggedUser = loggedUsers.find(u => u.email === email);
+    if (!loggedUser) {
+      loggedUsers.push({
+        id: user[0].id,
+        firstName: user[0].firstName,
+        lastName: user[0].lastName,
+        email: user[0].email,
+        mobile: user[0].mobile,
+        country: user[0].country
       });
-      return token;
     }
 
-    const token = generateToken(user[0].id); 
-
-    res.json({ token, email: user[0].email });
+  
+    res.json({
+      token,
+      user: {
+        id: user[0].id,
+        firstName: user[0].firstName,
+        lastName: user[0].lastName,
+        email: user[0].email,
+        mobile: user[0].mobile,
+        country: user[0].country,
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to login.' });
   }
 });
+
+
+app.get('/loggedUsers', (req, res) => {
+  res.json(loggedUsers); 
+});
+
 app.listen(3001, () => {
   console.log('Server is running on port 3001');
 });
