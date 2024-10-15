@@ -1,0 +1,19 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "ImportDeclaration[source.value=/\\.js$/]",
+          "message": "JavaScript files are not allowed."
+        }
+      ]
+    }
+  }
+  

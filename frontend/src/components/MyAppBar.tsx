@@ -49,7 +49,7 @@ export default function ButtonAppBar() {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              <Link to="/" onClick={() => {}}>
+              <Link to="/">
                 DEAL BUDDY
               </Link>
             </span>
