@@ -24,32 +24,29 @@ const Users = () => {
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchLoggedUsers = async () => {
+    const fetchRegisteredUsers = async () => {
       try {
-        const token = localStorage.getItem('token'); 
-
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/loggedUsers`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/registeredUsers`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, 
           },
         });
-
+  
         const data = await response.json();
-
+  
         if (response.ok) {
           setUsers(data);
         } else {
-          setError('Failed to fetch logged users');
+          setError('Failed to fetch registered users');
         }
       } catch (error) {
         console.error(error);
-        setError('An error occurred while fetching logged users');
+        setError('An error occurred while fetching registered users');
       }
     };
-
-    fetchLoggedUsers();
+  
+    fetchRegisteredUsers();
   }, []);
 
   const handleSaveUser = () => {

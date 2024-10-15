@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
-const loggedUsers = []; 
+let loggedUser = null;
 
 
 const SECRET_KEY = 'Vedant@123'; 
@@ -78,6 +78,11 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  // Check if a user is already logged in
+  if (loggedUser) {
+    return res.status(400).json({ error: 'Someone is already logged in. Please log out first.' });
+  }
+
   const query = `SELECT * FROM users WHERE email = ?`;
   const values = [email];
 
@@ -92,46 +97,52 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-  
     const token = jwt.sign({ id: user[0].id }, SECRET_KEY, {
       expiresIn: '1h',
     });
 
-   
-    const loggedUser = loggedUsers.find(u => u.email === email);
-    if (!loggedUser) {
-      loggedUsers.push({
-        id: user[0].id,
-        firstName: user[0].firstName,
-        lastName: user[0].lastName,
-        email: user[0].email,
-        mobile: user[0].mobile,
-        country: user[0].country
-      });
-    }
+    loggedUser = {
+      id: user[0].id,
+      firstName: user[0].firstName,
+      lastName: user[0].lastName,
+      email: user[0].email,
+      mobile: user[0].mobile,
+      country: user[0].country,
+    };
 
-  
     res.json({
       token,
-      user: {
-        id: user[0].id,
-        firstName: user[0].firstName,
-        lastName: user[0].lastName,
-        email: user[0].email,
-        mobile: user[0].mobile,
-        country: user[0].country,
-      }
+      user: loggedUser
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to login.' });
   }
 });
 
+app.post('/logout', (req, res) => {
+  if (!loggedUser ) {
+    return res.status(400).json({ error: 'No user is currently logged in.' });
+  }
 
-app.get('/loggedUsers', (req, res) => {
-  res.json(loggedUsers); 
+  loggedUser  = null;
+  res.json({ message: 'Logged out successfully.' });
 });
+
+app.get('/registeredUsers', async (req, res) => {
+  try {
+    const query = `SELECT * FROM users`;
+    const [users] = await db.execute(query);
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to retrieve registered users.' });
+  }
+});
+ 
+
+
 
 app.listen(3001, () => {
   console.log('Server is running on port 3001');
