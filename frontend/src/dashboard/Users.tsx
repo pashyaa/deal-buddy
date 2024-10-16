@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Typography, Table, TableRow, TableCell, TableBody, Container, Box, IconButton, Paper } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 
@@ -67,24 +66,29 @@ const Users = () => {
     setCountry('');
   };
 
-  // Function to edit a user
-  const handleEditUser = (id: number) => {
-    const userToEdit = users.find(user => user.id === id);
-    if (userToEdit) {
-      setEditingUserId(id);
-      setFirstName(userToEdit.firstName);
-      setLastName(userToEdit.lastName);
-      setEmail(userToEdit.email);
-      setMobile(userToEdit.mobile);
-      setCountry(userToEdit.country);
+
+  
+
+
+  const handleDeleteUser = async (id: number) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+  
+      
+      const updatedUsers = users.filter(user => user.id !== id);
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error(error);
+      setError('An error occurred while deleting the user');
     }
   };
-
-
-  const handleDeleteUser = (id: number) => {
-    const updatedUsers = users.filter(user => user.id !== id);
-    setUsers(updatedUsers);
-  };
+  
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -114,15 +118,12 @@ const Users = () => {
                     <TableBody>
                       {users.map(user => (
                         <TableRow key={user.id}>
-                          <TableCell sx={{ width: 150, px: 1 }}>{user.firstName}</TableCell>
-                          <TableCell sx={{ width: 100, px: 1 }}>{user.lastName}</TableCell>
-                          <TableCell sx={{ width: 150, px: 1 }}>{user.email}</TableCell>
-                          <TableCell sx={{ width: 100, px: 1 }}>{user.mobile}</TableCell>
-                          <TableCell sx={{ width: 100, px: 1 }}>{user.country}</TableCell>
-                          <TableCell sx={{ width: 80, px: 1 }}>
-                            <IconButton aria-label="edit" onClick={() => handleEditUser(user.id)}>
-                              <EditIcon />
-                            </IconButton>
+                          <TableCell sx={{ width: 150, px: 1, height: 50}}>{user.firstName}</TableCell>
+                          <TableCell sx={{ width: 100, px: 1, height: 50 }}>{user.lastName}</TableCell>
+                          <TableCell sx={{ width: 150, px: 1, height: 50 }}>{user.email}</TableCell>
+                          <TableCell sx={{ width: 100, px: 1, height: 50 }}>{user.mobile}</TableCell>
+                          <TableCell sx={{ width: 100, px: 1, height: 50 }}>{user.country}</TableCell>
+                          <TableCell sx={{ width: 80, px: 1, height: 50 }}>
                             &nbsp;&nbsp;
                             <IconButton aria-label="delete" onClick={() => handleDeleteUser(user.id)}>
                               <DeleteIcon />

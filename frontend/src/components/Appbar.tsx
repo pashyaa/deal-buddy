@@ -81,7 +81,7 @@ export default function MenuAppBar() {
             </span>
           </Typography>
 
-          {/* Display About and Contact buttons on Desktop */}
+          
           {isDesktop && (
             <div>
               <Button sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}>
@@ -93,9 +93,17 @@ export default function MenuAppBar() {
             </div>
           )}
 
-         
-
           
+          {isAuthenticated && (
+            <Button
+              sx={{ color: 'black', fontSize: 18, fontWeight: 'bold' }}
+              component={Link}
+              to="/dashboard"
+            >
+              Dashboard
+            </Button>
+          )}
+
           {isAuthenticated ? (
             <>
               <IconButton
@@ -154,7 +162,6 @@ export default function MenuAppBar() {
               }}
               open={Boolean(anchorEl)}
               onClose={handleClose}
-              
             >
               <MenuItems />
               {!isAuthenticated && (

@@ -178,9 +178,13 @@ export default function Createaccount() {
         <Grid item xs={12}>
           <TextField
             label="Mobile Number"
+            type='number' 
             fullWidth
             value={formData.mobile}
-            onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+            onChange={(e) => {
+              const mobile = e.target.value.slice(0, 10);  
+              setFormData({ ...formData, mobile });
+            }}
             error={!!errors.mobile}
             helperText={errors.mobile}
             sx={{ marginBottom: 0.5 }} 

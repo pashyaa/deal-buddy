@@ -5,8 +5,8 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
-let loggedUser = null;
 
+const loggedUsers = []; 
 
 const SECRET_KEY = 'Vedant@123'; 
 
@@ -78,11 +78,6 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  // Check if a user is already logged in
-  if (loggedUser) {
-    return res.status(400).json({ error: 'Someone is already logged in. Please log out first.' });
-  }
-
   const query = `SELECT * FROM users WHERE email = ?`;
   const values = [email];
 
@@ -101,18 +96,28 @@ app.post('/login', async (req, res) => {
       expiresIn: '1h',
     });
 
-    loggedUser = {
-      id: user[0].id,
-      firstName: user[0].firstName,
-      lastName: user[0].lastName,
-      email: user[0].email,
-      mobile: user[0].mobile,
-      country: user[0].country,
-    };
+    const loggedUser = loggedUsers.find(u => u.email === email);
+    if (!loggedUser) {
+      loggedUsers.push({
+        id: user[0].id,
+        firstName: user[0].firstName,
+        lastName: user[0].lastName,
+        email: user[0].email,
+        mobile: user[0].mobile,
+        country: user[0].country
+      });
+    }
 
     res.json({
       token,
-      user: loggedUser
+      user: {
+        id: user[0].id,
+        firstName: user[0].firstName,
+        lastName: user[0].lastName,
+        email: user[0].email,
+        mobile: user[0].mobile,
+        country: user[0].country,
+      }
     });
 
   } catch (error) {
@@ -121,13 +126,8 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/logout', (req, res) => {
-  if (!loggedUser ) {
-    return res.status(400).json({ error: 'No user is currently logged in.' });
-  }
-
-  loggedUser  = null;
-  res.json({ message: 'Logged out successfully.' });
+app.get('/loggedUsers', (req, res) => {
+  res.json(loggedUsers); 
 });
 
 app.get('/registeredUsers', async (req, res) => {
@@ -141,6 +141,24 @@ app.get('/registeredUsers', async (req, res) => {
   }
 });
  
+app.delete('/users/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const deleteUserQuery = `DELETE FROM users WHERE id = ?`;
+
+  try {
+    const [result] = await db.execute(deleteUserQuery, [id]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({ message: 'User deleted successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete user.' });
+  }
+});
 
 
 
