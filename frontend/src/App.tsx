@@ -3,6 +3,7 @@ import './styles/App.css';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Createaccount from './pages/Createaccount';
+import Profile from './pages/Profile'
 import MainLayout from './components/MainLayout';
 import DashboardLayout from './dashboard/DashboardLayout';
 import Users from './dashboard/Users';
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/register" element={<Createaccount />} />
           <Route path="/vouchers" element={<Vouchers />} />
+          <Route  path="/profile" element={<Profile />} />
         </Route>
 
         <Route element={<DashboardLayout />}>

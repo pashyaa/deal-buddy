@@ -82,7 +82,7 @@ export default function ButtonAppBar() {
             
           >
             <MenuItem onClick={handleClose}>
-              <Link to="/dashboard/users" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
                 Profile
               </Link>
             </MenuItem>

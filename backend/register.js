@@ -160,6 +160,58 @@ app.delete('/users/:id', async (req, res) => {
   }
 });
 
+app.get('/profile', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized access.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const userId = decoded.id;
+
+    const query = 'SELECT id, firstName, lastName, email, mobile, country FROM users WHERE id = ?';
+    
+    db.execute(query, [userId])
+      .then(([user]) => {
+        if (!user || user.length === 0) {
+          return res.status(404).json({ error: 'User not found.' });
+        }
+        res.json({ user: user[0] });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve user profile.' });
+      });
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid token.' });
+  }
+});
+
+app.put('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, mobile, country } = req.body;
+
+  const updateQuery = `
+    UPDATE users
+    SET firstName = ?, lastName = ?, mobile = ?, country = ?
+    WHERE id = ?
+  `;
+  
+  try {
+    const [result] = await db.execute(updateQuery, [firstName, lastName, mobile, country, id]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({ message: 'User updated successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update user.' });
+  }
+});
 
 
 app.listen(3001, () => {
