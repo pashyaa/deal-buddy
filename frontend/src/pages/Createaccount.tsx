@@ -132,9 +132,9 @@ export default function Createaccount() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 50px)' }}>
+    <Container maxWidth="sm" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
     <CssBaseline />
-    <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#F5F5DC', width: '100%', height: '650px' }}>
+    <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#F5F5DC' }}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <h2 style={{ marginBottom: '10px' }}>Registration Form</h2> 

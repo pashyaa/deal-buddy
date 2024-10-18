@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Paper, Grid, Container, CssBaseline, TextField, Button, } from '@mui/material';
+import { Paper, Grid, Container, CssBaseline, TextField, Button, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 interface ProfileFormData {
@@ -21,13 +21,12 @@ export default function Profile() {
   });
 
   const [userId, setUserId] = useState<number | null>(null);
-
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
-
       if (token) {
         try {
           const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
@@ -48,11 +47,9 @@ export default function Profile() {
           setUserId(id); 
         } catch (error) {
           console.error('Error fetching profile data:', error);
-          
-          navigate('/login');
+          navigate('/auth');
         }
       } else {
-       
         navigate('/auth');
       }
     };
@@ -69,7 +66,6 @@ export default function Profile() {
 
   const handleSave = async () => {
     const token = localStorage.getItem('token');
-
     if (token && userId !== null) {
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
@@ -86,23 +82,29 @@ export default function Profile() {
         }
 
         const data = await response.json();
-        console.log('User updated successfully', data);
-       
+        console.log('User  updated successfully', data);
+        setOpenSnackbar(true);
       } catch (error) {
         console.error('Error updating user:', error);
-       
       }
     }
+  };
+
+  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
     <Container maxWidth="sm" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <CssBaseline />
-      <Paper variant="outlined" sx={{ p: 2,  width: '100%' }}>
-      <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <h2 style={{ marginBottom: '10px' }}>Personal Details</h2> 
-        </Grid>
+      <Paper variant="outlined" sx={{ p: 2, width: '100%' }}>
+        <Grid container spacing={1}>
+          <Grid item xs={12}>
+            <h2 style={{ marginBottom: '10px' }}>Personal Details</h2> 
+          </Grid>
           <Grid item xs={6}>
             <TextField
               name="firstName"
@@ -161,6 +163,11 @@ export default function Profile() {
           </Grid>
         </Grid>
       </Paper>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={(event) => handleCloseSnackbar(event, 'clickaway')} severity="success" sx={{ width: '100%' }}>
+          User updated successfully!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
