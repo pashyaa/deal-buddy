@@ -104,9 +104,8 @@ const Users = () => {
             <Grid container spacing={2}>
               <Typography variant="h4" sx={{ flex: 1, textAlign: 'center', color: '#000000' }}>Users</Typography>
               <Grid item xs={12}>
-                <Typography variant="h5">User List</Typography>
                 <Paper sx={{ maxHeight: 250, backgroundColor: '#F5F5F5', overflow: 'auto' }}>
-                  <Table>
+                  <Table  size="small">
                     <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                       <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', width: 150, px: 1 }}>First Name</TableCell>
                       <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', width: 100, px: 1 }}>Last Name</TableCell>

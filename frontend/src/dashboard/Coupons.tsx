@@ -1,7 +1,11 @@
-import React, { useState, ChangeEvent } from 'react';
-import { Grid, Button, Typography, Container, Box, TextField, FormControl, FormLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import React, { useState, ChangeEvent, useEffect } from 'react';
+import { Grid, Button, Typography, Container, Box, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Table, TableBody, TableCell, TableHead, TableRow, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { SelectChangeEvent } from '@mui/material';
 
 interface Coupon {
+  id?: number;
   code: string;
   description: string;
   discountType: 'Percentage' | 'Flat';
@@ -19,22 +23,148 @@ const Coupons = () => {
     discountValue: '',
     expiryDate: ''
   });
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [currentCouponId, setCurrentCouponId] = useState<number | undefined>(undefined);
 
- 
+  const fetchCoupons = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch coupons');
+      }
+
+      const data = await response.json();
+      setCoupons(data);
+    } catch (error) {
+      console.error('Error fetching coupons:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCoupons();
+  }, []);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCouponData({ ...couponData, [name]: value });
   };
-
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setCouponData({ ...couponData, [name]: value });
   };
 
-  const handleAddCoupon = () => {
-    setCoupons([...coupons, { ...couponData, status: 'Active' }]);
-    setCouponData({ code: '', description: '', discountType: 'Percentage', discountValue: '', expiryDate: '' }); 
+  const handleAddCoupon = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...couponData, status: 'Active' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add coupon');
+      }
+
+      await fetchCoupons();
+      setCouponData({ code: '', description: '', discountType: 'Percentage', discountValue: '', expiryDate: '' });
+    } catch (error) {
+      console.error('Error adding coupon:', error);
+    }
+  };
+
+  const handleEditCoupon = async (id: number) => {
+    if (!couponData.code || !couponData.description || !couponData.discountValue || !couponData.expiryDate) {
+      console.error('All fields must be filled before updating the coupon.');
+      return;
+    }
+  
+    
+    const updatedCouponData = {
+      id,
+      code: couponData.code || null, 
+      description: couponData.description || null, 
+      discountType: couponData.discountType || null, 
+      discountValue: couponData.discountValue ? Number(couponData.discountValue) : null, 
+      expiryDate: couponData.expiryDate ? new Date(couponData.expiryDate).toISOString().split('T')[0] : null, 
+    };
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedCouponData),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text(); 
+        throw new Error(`Failed to update coupon: ${errorText}`);
+      }
+  
+      await fetchCoupons();
+      setCouponData({ code: '', description: '', discountType: 'Percentage', discountValue: '', expiryDate: '' });
+      setIsEditing(false); 
+      setCurrentCouponId(undefined); 
+    } catch (error) {
+      console.error('Error updating coupon:', error);
+    }
+  };
+
+  const handleSelectCouponForEdit = (coupon: Coupon) => {
+    setCouponData({
+      code: coupon.code,
+      description: coupon.description,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      expiryDate: coupon.expiryDate,
+    });
+    setIsEditing(true);
+    setCurrentCouponId(coupon.id);
+  };
+
+  const handleDeleteCoupon = async (id: number) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete coupon');
+      }
+
+      await fetchCoupons();
+    } catch (error) {
+      console.error('Error deleting coupon:', error);
+    }
+  };
+
+  const formatExpiryDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleButtonClick = async () => {
+    if (isEditing && currentCouponId) {
+      await handleEditCoupon(currentCouponId);
+    } else {
+      await handleAddCoupon();
+    }
   };
 
   return (
@@ -56,12 +186,12 @@ const Coupons = () => {
           maxHeight: 590
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Coupons</Typography>
         </Box>
-        <Typography variant="h6">Add Coupon</Typography>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          
+          <Grid item xs={3}>
             <TextField
               label="Code"
               name="code"
@@ -72,7 +202,7 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <TextField
               label="Description"
               name="description"
@@ -83,20 +213,21 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <FormControl fullWidth required>
-              <FormLabel>Discount Type</FormLabel>
+              <InputLabel shrink>Discount Type</InputLabel>
               <Select
                 name="discountType"
                 value={couponData.discountType}
                 onChange={handleSelectChange}
+                label="Discount Type"
               >
                 <MenuItem value="Percentage">Percentage</MenuItem>
                 <MenuItem value="Flat">Flat</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <TextField
               label="Discount Value"
               name="discountValue"
@@ -108,7 +239,7 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <TextField
               label="Expiry Date"
               name="expiryDate"
@@ -120,30 +251,60 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" color="primary" onClick={handleAddCoupon}>
-              Add Coupon
+          <Grid item xs={3}>
+            <Button variant="contained" color="primary" onClick={handleButtonClick}>
+              {isEditing ? 'Update Coupon' : 'Add Coupon'}
             </Button>
           </Grid>
         </Grid>
 
-        <Typography variant="h6" sx={{ mt: 4 }}>Coupons List</Typography>
-        <Container sx={{ maxHeight: 100, overflowY: 'auto', mt: 1, p: 1 }}>
-  {coupons.length > 0 ? (
-    coupons.map((coupon, index) => (
-      <Container key={index} sx={{ border: '1px solid #000', p: 1, mt: 1}}>
-        <Typography variant="body1">Code: {coupon.code}</Typography>
-        <Typography variant="body1">Description: {coupon.description}</Typography>
-        <Typography variant="body1">Discount Type: {coupon.discountType}</Typography>
-        <Typography variant="body1">Discount Value: {coupon.discountValue}</Typography>
-        <Typography variant="body1">Expiry Date: {coupon.expiryDate}</Typography>
-        <Typography variant="body1">Status: {coupon.status}</Typography>
-      </Container>
-    ))
-  ) : (
-    <Typography variant="body1">No coupons added yet.</Typography>
-  )}
-</Container>
+        <Paper sx={{ maxHeight: 175, overflow: 'auto' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+                <TableCell sx={{ width: 150, px: 1 }}>Code</TableCell>
+                <TableCell sx={{ width: 150, px: 1 }}>Description</TableCell>
+                <TableCell sx={{ width: 100, px: 1 }}>Discount Type</TableCell>
+                <TableCell sx={{ width: 100, px: 1 }}>Discount Value</TableCell>
+                <TableCell sx={{ width: 100, px: 1 }}>Expiry Date</TableCell>
+                <TableCell sx={{ width: 80, px: 1 }}>Status</TableCell>
+                <TableCell sx={{ width: 80, px: 1 }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+           <TableBody>
+  {coupons.length > 0 && coupons.map((coupon, index) => (
+    <TableRow key={index}>
+      <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.code}</TableCell>
+      <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.description}</TableCell>
+      <TableCell sx={{ width: 100, px: 0.5}}>{coupon.discountType}</TableCell>
+      <TableCell sx={{ width: 100, px: 0.5}}>{coupon.discountValue}</TableCell>
+      <TableCell sx={{ width: 100, px: 0.5}}>{formatExpiryDate(coupon.expiryDate)}</TableCell>
+      <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.status}</TableCell>
+      <TableCell sx={{ width: 60, px: 0.5 }}>
+        <IconButton aria-label="edit" onClick={() => handleSelectCouponForEdit(coupon)}>
+          <EditIcon />
+        </IconButton>
+        &nbsp;&nbsp;
+        <IconButton
+  aria-label="delete"
+  onClick={() => {
+    if (coupon.id !== undefined) {
+      handleDeleteCoupon(coupon.id);
+    } else {
+      console.error('Coupon ID is undefined');
+    }
+  }}
+>
+  <DeleteIcon />
+</IconButton>
+
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
+          </Table>
+        </Paper>
 
       </Container>
     </Box>

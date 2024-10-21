@@ -33,14 +33,28 @@ const createUserTableQuery = `
     PRIMARY KEY (id)
   );
 `;
-
+const createCouponTableQuery=`
+CREATE TABLE IF NOT EXISTS coupons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(255) NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  discountType ENUM('Percentage', 'Flat') NOT NULL,
+  discountValue DECIMAL(10, 2) NOT NULL,
+  expiryDate DATE NOT NULL,
+  status ENUM('Active', 'Inactive') NOT NULL
+);
+`;
 async function createTable() {
   try {
     await db.execute(dropUserTableQuery);
     console.log('Table dropped successfully');
 
     await db.execute(createUserTableQuery);
-    console.log('Table created successfully');
+    console.log('User table created successfully');
+
+    await db.execute(createCouponTableQuery);
+    console.log('Coupon table created successfully');
+
   } catch (error) {
     console.error(`Error creating table: ${error.message}`);
   }
@@ -189,27 +203,110 @@ app.get('/profile', (req, res) => {
   }
 });
 
-app.put('/users/:id', async (req, res) => {
+app.put('/coupons/:id', async (req, res) => {
+  const { code, description, discountType, discountValue, expiryDate } = req.body;
   const { id } = req.params;
-  const { firstName, lastName, mobile, country } = req.body;
 
-  const updateQuery = `
-    UPDATE users
-    SET firstName = ?, lastName = ?, mobile = ?, country = ?
+  // Log the incoming data
+  console.log('Updating coupon with data:', {
+    code,
+    description,
+    discountType,
+    discountValue,
+    expiryDate,
+    id
+  });
+
+  const query = `
+    UPDATE coupons SET code = ?, description = ?, discountType = ?, discountValue = ?, expiryDate = ?, status = 'Active'
     WHERE id = ?
   `;
-  
-  try {
-    const [result] = await db.execute(updateQuery, [firstName, lastName, mobile, country, id]);
-    
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'User not found.' });
-    }
+  const values = [
+    code,
+    description,
+    discountType,
+    discountValue,
+    expiryDate,
+    id
+  ];
 
-    res.json({ message: 'User updated successfully.' });
+  try {
+    await db.execute(query, values);
+    res.json({ message: 'Coupon updated successfully.' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update user.' });
+    console.error('Error updating coupon:', error.message);
+    res.status(500).json({ error: 'Failed to update coupon.' });
+  }
+});
+
+
+app.post('/coupons', async (req, res) => {
+  const { code, description, discountType, discountValue, expiryDate, status } = req.body;
+  const query = `
+    INSERT INTO coupons (code, description, discountType, discountValue, expiryDate, status)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+  const values = [code, description, discountType, discountValue, expiryDate, status];
+
+  try {
+    await db.execute(query, values);
+    res.json({ message: 'Coupon added successfully.' });
+  } catch (error) {
+    console.error('Error adding coupon:', error.message);
+    res.status(500).json({ error: 'Failed to add coupon.' });
+  }
+});
+
+app.get('/coupons', async (req, res) => {
+  const query = 'SELECT * FROM coupons';
+  try {
+    const [coupons] = await db.execute(query);
+    res.json(coupons);
+  } catch (error) {
+    console.error('Error fetching coupons:', error.message);
+    res.status(500).json({ error: 'Failed to fetch coupons.' });
+  }
+});
+
+app.put('/coupons/:id', async (req, res) => {
+  const { code, description, discountType, discountValue, expiryDate, status } = req.body;
+  const { id } = req.params;
+
+  console.log('Updating coupon with data:', {
+    code,
+    description,
+    discountType,
+    discountValue,
+    expiryDate,
+    status,
+    id
+  });
+
+  const query = `
+    UPDATE coupons SET code = ?, description = ?, discountType = ?, discountValue = ?, expiryDate = ?, status = ?
+    WHERE id = ?
+  `;
+  const values = [code, description, discountType, discountValue, expiryDate, status, id];
+
+  try {
+    await db.execute(query, values);
+    res.json({ message: 'Coupon updated successfully.' });
+  } catch (error) {
+    console.error('Error updating coupon:', error.message);
+    res.status(500).json({ error: 'Failed to update coupon.' });
+  }
+});
+
+app.delete('/coupons/:id', async (req, res) => {
+  const { id } = req.params;
+  const query = `DELETE FROM coupons WHERE id = ?`;
+
+  try {
+    await db.execute(query, [id]);
+    res.json({ message: 'Coupon deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting coupon:', error.message);
+    res.status(500).json({ error: 'Failed to delete coupon.' });
   }
 });
 
