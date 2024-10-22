@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Paper, Grid, Container, CssBaseline, TextField, Button, Snackbar, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 
 interface ProfileFormData {
   firstName: string;
@@ -22,7 +22,18 @@ export default function Profile() {
 
   const [userId, setUserId] = useState<number | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+    setIsLoading(false);  
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -47,15 +58,15 @@ export default function Profile() {
           setUserId(id); 
         } catch (error) {
           console.error('Error fetching profile data:', error);
-          navigate('/auth');
         }
-      } else {
-        navigate('/auth');
-      }
+      } 
     };
 
-    fetchProfile();
-  }, [navigate]);
+    if (isLoggedIn) {
+      fetchProfile();
+    }
+  }, [navigate, isLoggedIn]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfileData({
@@ -96,6 +107,14 @@ export default function Profile() {
     }
     setOpenSnackbar(false);
   };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to="/auth" replace />;
+  }
+
 
   return (
     <Container maxWidth="sm" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

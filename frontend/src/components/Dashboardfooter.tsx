@@ -2,11 +2,13 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
 
-const Footer: React.FC = () => {
+
+
+const Dashboardfooter: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: '#333', color: '#fff', py: 3, mt: 6 }}>
+    <Box sx={{ bgcolor: '#666', color: '#fff', py: 3, mt: 6 }}>
       <Container>
-        <Typography variant="body2" align="center">
+        <Typography variant="body2" align="center"sx={{ ml: 2  }}>
           &copy; {new Date().getFullYear()} DealBuddy. All rights reserved.
         </Typography>
       </Container>
@@ -14,4 +16,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer;
+export default Dashboardfooter;

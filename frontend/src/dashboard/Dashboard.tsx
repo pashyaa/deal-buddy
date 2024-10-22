@@ -30,7 +30,7 @@ const Dashboard = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 64, overflow: 'hidden' }}>
       <Grid container spacing={2}>
-        <Grid item xs={3} sx={{ mt: -64 }}>
+        <Grid item xs={3} >
           <MenuBar />
         </Grid>
         <Grid item xs={9}>

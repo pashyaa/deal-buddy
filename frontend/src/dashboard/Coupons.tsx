@@ -1,5 +1,7 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
-import { Grid, Button, Typography, Container, Box, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Table, TableBody, TableCell, TableHead, TableRow, IconButton } from '@mui/material';
+import {
+  Grid, Button, Typography, Container, Box, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SelectChangeEvent } from '@mui/material';
@@ -24,6 +26,8 @@ const Coupons = () => {
     expiryDate: ''
   });
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [couponToDelete, setCouponToDelete] = useState<number | undefined>(undefined);
   const [currentCouponId, setCurrentCouponId] = useState<number | undefined>(undefined);
 
   const fetchCoupons = async () => {
@@ -86,17 +90,17 @@ const Coupons = () => {
       console.error('All fields must be filled before updating the coupon.');
       return;
     }
-  
-    
+
+
     const updatedCouponData = {
       id,
-      code: couponData.code || null, 
-      description: couponData.description || null, 
-      discountType: couponData.discountType || null, 
-      discountValue: couponData.discountValue ? Number(couponData.discountValue) : null, 
-      expiryDate: couponData.expiryDate ? new Date(couponData.expiryDate).toISOString().split('T')[0] : null, 
+      code: couponData.code || null,
+      description: couponData.description || null,
+      discountType: couponData.discountType || null,
+      discountValue: couponData.discountValue ? Number(couponData.discountValue) : null,
+      expiryDate: couponData.expiryDate ? new Date(couponData.expiryDate).toISOString().split('T')[0] : null,
     };
-  
+
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons/${id}`, {
         method: 'PUT',
@@ -105,16 +109,16 @@ const Coupons = () => {
         },
         body: JSON.stringify(updatedCouponData),
       });
-  
+
       if (!response.ok) {
-        const errorText = await response.text(); 
+        const errorText = await response.text();
         throw new Error(`Failed to update coupon: ${errorText}`);
       }
-  
+
       await fetchCoupons();
       setCouponData({ code: '', description: '', discountType: 'Percentage', discountValue: '', expiryDate: '' });
-      setIsEditing(false); 
-      setCurrentCouponId(undefined); 
+      setIsEditing(false);
+      setCurrentCouponId(undefined);
     } catch (error) {
       console.error('Error updating coupon:', error);
     }
@@ -183,16 +187,18 @@ const Coupons = () => {
           boxShadow: 3,
           borderRadius: 4,
           flex: 'full',
+          paddingTop: '20px',
           maxHeight: 590
         }}
       >
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Coupons</Typography>
         </Box>
-        <Grid container spacing={2}>
-          
-          <Grid item xs={3}>
+        <Grid container spacing={2} sx={{ mt: 0 }}>
+
+          <Grid item xs={4}>
             <TextField
+              size="small"
               label="Code"
               name="code"
               value={couponData.code}
@@ -202,8 +208,9 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <TextField
+              size="small"
               label="Description"
               name="description"
               value={couponData.description}
@@ -213,8 +220,8 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={3}>
-            <FormControl fullWidth required>
+          <Grid item xs={4}>
+            <FormControl fullWidth required size="small">
               <InputLabel shrink>Discount Type</InputLabel>
               <Select
                 name="discountType"
@@ -227,8 +234,9 @@ const Coupons = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <TextField
+              size="small"
               label="Discount Value"
               name="discountValue"
               type="number"
@@ -239,8 +247,9 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <TextField
+              size="small"
               label="Expiry Date"
               name="expiryDate"
               type="date"
@@ -251,62 +260,87 @@ const Coupons = () => {
               required
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <Button variant="contained" color="primary" onClick={handleButtonClick}>
               {isEditing ? 'Update Coupon' : 'Add Coupon'}
             </Button>
           </Grid>
         </Grid>
 
-        <Paper sx={{ maxHeight: 175, overflow: 'auto' }}>
+        <Paper sx={{ maxHeight: 150, overflow: 'auto', mt: 2 }}>
           <Table size="small">
             <TableHead>
               <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
-                <TableCell sx={{ width: 150, px: 1 }}>Code</TableCell>
-                <TableCell sx={{ width: 150, px: 1 }}>Description</TableCell>
-                <TableCell sx={{ width: 100, px: 1 }}>Discount Type</TableCell>
-                <TableCell sx={{ width: 100, px: 1 }}>Discount Value</TableCell>
-                <TableCell sx={{ width: 100, px: 1 }}>Expiry Date</TableCell>
-                <TableCell sx={{ width: 80, px: 1 }}>Status</TableCell>
-                <TableCell sx={{ width: 80, px: 1 }}>Actions</TableCell>
+                <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Code</TableCell>
+                <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Description</TableCell>
+                <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Discount Type</TableCell>
+                <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Discount Value</TableCell>
+                <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Expiry Date</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
-           <TableBody>
-  {coupons.length > 0 && coupons.map((coupon, index) => (
-    <TableRow key={index}>
-      <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.code}</TableCell>
-      <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.description}</TableCell>
-      <TableCell sx={{ width: 100, px: 0.5}}>{coupon.discountType}</TableCell>
-      <TableCell sx={{ width: 100, px: 0.5}}>{coupon.discountValue}</TableCell>
-      <TableCell sx={{ width: 100, px: 0.5}}>{formatExpiryDate(coupon.expiryDate)}</TableCell>
-      <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.status}</TableCell>
-      <TableCell sx={{ width: 60, px: 0.5 }}>
-        <IconButton aria-label="edit" onClick={() => handleSelectCouponForEdit(coupon)}>
-          <EditIcon />
-        </IconButton>
-        &nbsp;&nbsp;
-        <IconButton
-  aria-label="delete"
-  onClick={() => {
-    if (coupon.id !== undefined) {
-      handleDeleteCoupon(coupon.id);
-    } else {
-      console.error('Coupon ID is undefined');
-    }
-  }}
->
-  <DeleteIcon />
-</IconButton>
+            <TableBody>
+              {coupons.length > 0 && coupons.map((coupon, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.code}</TableCell>
+                  <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.description}</TableCell>
+                  <TableCell sx={{ width: 100, px: 0.5 }}>{coupon.discountType}</TableCell>
+                  <TableCell sx={{ width: 100, px: 0.5 }}>{coupon.discountValue}</TableCell>
+                  <TableCell sx={{ width: 100, px: 0.5 }}>{formatExpiryDate(coupon.expiryDate)}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.status}</TableCell>
+                  <TableCell sx={{ width: 60, px: 0.5 }}>
+                    <IconButton aria-label="edit" size="small" onClick={() => handleSelectCouponForEdit(coupon)}>
+                      <EditIcon />
+                    </IconButton>
+                    &nbsp;&nbsp;
+                    <IconButton
+                      aria-label="delete"
+                      size="small"
+                      onClick={() => {
+                        if (coupon.id !== undefined) {
+                          setCouponToDelete(coupon.id);
+                          setDialogOpen(true);
+                        } else {
+                          console.error('Coupon ID is undefined');
+                        }
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
 
-      </TableCell>
-    </TableRow>
-  ))}
-</TableBody>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
 
           </Table>
         </Paper>
 
       </Container>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this coupon?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (couponToDelete !== undefined) {
+                handleDeleteCoupon(couponToDelete);
+                setDialogOpen(false);
+                setCouponToDelete(undefined);
+              }
+            }}
+            color="primary"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

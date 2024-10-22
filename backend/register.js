@@ -203,6 +203,27 @@ app.get('/profile', (req, res) => {
   }
 });
 
+
+app.put('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, mobile, country } = req.body;
+  const updateQuery = `
+  UPDATE users
+  SET firstName = ?, lastName = ?, mobile = ?, country = ?
+  WHERE id = ?
+  `;
+  try {
+      const [result] = await db.execute(updateQuery, [firstName, lastName, mobile, country, id]);
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'User  not found.' });
+      }
+      res.json({ message: 'User  updated successfully.' });
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Failed to update user.' });
+  }
+});
+
 app.put('/coupons/:id', async (req, res) => {
   const { code, description, discountType, discountValue, expiryDate } = req.body;
   const { id } = req.params;

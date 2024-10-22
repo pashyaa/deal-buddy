@@ -2,24 +2,24 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import MenuBar from '../components/MenuBar';
 import MyAppBar from '../components/MyAppBar';
-import { Box, Grid, Container, AppBar, Toolbar } from '@mui/material';
+import Dashboardfooter from '../components/Dashboardfooter';
+import { Box, Grid, Container } from '@mui/material';
 
 const DashboardLayout = () => {
   return (
-    <Box>
-      
-        <Container maxWidth="lg" sx={{ mt: 64, overflow: 'hidden' }}> 
-          <Grid container spacing={2}>
-            <Grid item xs={3} sx={{ mt: -64 }}>
-              <MenuBar />
-            </Grid>
-            <Grid item xs={9}>
-              <MyAppBar></MyAppBar>
-              <Outlet />
-            </Grid>
+    <Box sx={{ overflowY: 'hidden' }}>
+      <MyAppBar />
+      <Container maxWidth="lg" sx={{ pt: 8 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <MenuBar />
           </Grid>
-        </Container>
-    
+          <Grid item xs={9}>
+            <Outlet />
+          </Grid>
+        </Grid>
+      </Container>
+      <Dashboardfooter />
     </Box>
   );
 };
