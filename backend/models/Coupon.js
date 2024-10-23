@@ -12,19 +12,29 @@ const Coupon = sequelize.define('Coupon', {
         allowNull: false,
         unique: true
     },
-    discount: {
-        type: DataTypes.FLOAT,
+    description: {
+        type: DataTypes.STRING, 
         allowNull: false
     },
-    userId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: 'Users',
-            key: 'id'
-        }
-    }
+    discountType: {
+        type: DataTypes.ENUM('Percentage', 'Flat'), 
+        allowNull: false
+    },
+    discountValue: {
+        type: DataTypes.STRING, 
+        allowNull: false
+    },
+    expiryDate: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.STRING, 
+        allowNull: false
+    },
+    
 }, {
-    timestamps: true
+    timestamps: false
 });
 
 module.exports = Coupon;

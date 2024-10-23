@@ -1,4 +1,8 @@
 const User = require('../models/User');
+const bcrypt = require('bcrypt'); 
+const jwt = require('jsonwebtoken'); 
+
+
 
 // Create new user
 exports.createUser = async (req, res) => {
@@ -9,6 +13,34 @@ exports.createUser = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
+
+// User login
+exports.loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+       
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(200).json({ 
+            token, 
+            userId: user.id 
+        });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
 
 // Get all users
 exports.getUsers = async (req, res) => {
@@ -60,3 +92,4 @@ exports.deleteUser = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
+

@@ -25,7 +25,7 @@ const signIn: (
 
   try {
    
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,9 +36,8 @@ const signIn: (
     const data = await response.json();
 
     if (response.ok) {
-      
       localStorage.setItem('token', data.token);
-
+      localStorage.setItem('userId', data.userId); 
       
       if (navigate) {
         navigate('/dashboard');
@@ -73,9 +72,11 @@ export default function NotificationsSignInPageError() {
   
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
     if (token) {
       setIsLoggedIn(true); 
     }
+    
     setIsLoading(false); 
   }, []);
 

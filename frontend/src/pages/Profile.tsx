@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Paper, Grid, Container, CssBaseline, TextField, Button, Snackbar, Alert } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 
+
 interface ProfileFormData {
   firstName: string;
   lastName: string;
@@ -10,7 +11,9 @@ interface ProfileFormData {
   mobile: string;
   country: string;
 }
-
+interface UserResponse {
+  user: ProfileFormData & { id: number }; 
+}
 export default function Profile() {
   const [profileData, setProfileData] = useState<ProfileFormData>({
     firstName: '',
@@ -26,11 +29,21 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfileData({
+      ...profileData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const storedUserId = localStorage.getItem('userId'); 
     if (token) {
       setIsLoggedIn(true);
+      if (storedUserId) {
+        setUserId(Number(storedUserId)); 
+      }
     }
     setIsLoading(false);  
   }, []);
@@ -38,9 +51,13 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
-      if (token) {
+      console.log('Token:', token);
+      console.log('User  ID:', userId); 
+      if (token && userId) { 
         try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+          const endpoint = `${process.env.REACT_APP_API_URL}/users/${userId}`;
+          console.log(`Fetching from: ${endpoint}`);
+          const response = await fetch(endpoint, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -49,31 +66,29 @@ export default function Profile() {
           });
 
           if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Fetch failed with status:', response.status, 'Response:', errorText);
             throw new Error('Failed to fetch profile data');
           }
 
           const data = await response.json();
-          const { firstName, lastName, email, mobile, country, id } = data.user;
+          console.log('Fetched data:', data); 
+
+         
+          const { firstName, lastName, email, mobile, country } = data; 
           setProfileData({ firstName, lastName, email, mobile, country });
-          setUserId(id); 
         } catch (error) {
           console.error('Error fetching profile data:', error);
         }
-      } 
+      } else {
+        console.error('No valid token or userId not set');
+      }
     };
-
+  
     if (isLoggedIn) {
       fetchProfile();
     }
-  }, [navigate, isLoggedIn]);
-
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfileData({
-      ...profileData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  }, [navigate, isLoggedIn, userId]);
 
   const handleSave = async () => {
     const token = localStorage.getItem('token');

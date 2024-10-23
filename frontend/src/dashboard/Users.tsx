@@ -27,7 +27,7 @@ const Users = () => {
   useEffect(() => {
     const fetchRegisteredUsers = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/registeredUsers`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

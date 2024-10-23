@@ -32,23 +32,27 @@ const Coupons = () => {
 
   const fetchCoupons = async () => {
     try {
+      console.log('API URL:', process.env.REACT_APP_API_URL);
+      
       const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (!response.ok) {
-        throw new Error('Failed to fetch coupons');
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch coupons: ${errorText}`);
       }
-
+  
       const data = await response.json();
       setCoupons(data);
-    } catch (error) {
-      console.error('Error fetching coupons:', error);
+    } catch (error: any) {
+      console.error('Error fetching coupons:', error.message);
     }
   };
+  
 
   useEffect(() => {
     fetchCoupons();
@@ -67,6 +71,7 @@ const Coupons = () => {
   const handleAddCoupon = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

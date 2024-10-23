@@ -17,7 +17,7 @@ interface RegistrationFormData {
 const registration = async (formData: RegistrationFormData) => {
   try {
     console.log(process.env.REACT_APP_API_URL);
-    const response = await fetch(process.env.REACT_APP_API_URL + '/register', {
+    const response = await fetch(process.env.REACT_APP_API_URL + '/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
