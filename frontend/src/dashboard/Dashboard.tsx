@@ -28,7 +28,7 @@ const Dashboard = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 64, overflow: 'hidden' }}>
+    <Container maxWidth="sm"sx={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', marginTop: '20px'}} >
       <Grid container spacing={2}>
         <Grid item xs={3} >
           <MenuBar />
@@ -36,8 +36,9 @@ const Dashboard = () => {
         <Grid item xs={9}>
           <MyAppBar />
           <Routes>
-            <Route path="/dashboard/users" element={<Users/>} />
+            <Route path='/dashboard' element={<Users/>} />
             <Route path="/dashboard/coupons" element={<Coupons />} />
+            <Route path="/dashboard/users" element={<Users/>} />
           </Routes>
         </Grid>
       </Grid>

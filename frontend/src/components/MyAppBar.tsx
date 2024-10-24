@@ -14,8 +14,8 @@ import Users from '../dashboard/Users';
 import Coupons from '../dashboard/Coupons';
 
 const NAVIGATION = [
-  { title: 'Users', link: '/dashboard/users' },
   { title: 'Coupons', link: '/dashboard/coupons' },
+  { title: 'Users', link: '/dashboard/users' },
 ];
 
 export default function ButtonAppBar() {
@@ -92,8 +92,8 @@ export default function ButtonAppBar() {
       </AppBar>
       <MenuBar navigation={NAVIGATION} />
       <Routes>
-        <Route path="/dashboard/users" element={<Users />} />
         <Route path="/dashboard/coupons" element={<Coupons />} />
+        <Route path="/dashboard/users" element={<Users />} />
       </Routes>
     </Box>
   );

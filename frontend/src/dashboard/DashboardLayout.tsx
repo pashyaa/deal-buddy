@@ -7,9 +7,9 @@ import { Box, Grid, Container } from '@mui/material';
 
 const DashboardLayout = () => {
   return (
-    <Box sx={{ overflowY: 'hidden' }}>
+    <Box >
       <MyAppBar />
-      <Container maxWidth="lg" sx={{ pt: 8 }}>
+      <Container maxWidth="lg" >
         <Grid container spacing={2}>
           <Grid item xs={3}>
             <MenuBar />

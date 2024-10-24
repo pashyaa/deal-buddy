@@ -93,7 +93,7 @@ const Users = () => {
 
 
   return (
-    <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ width: '50%', minHeight: '50vh', display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
       <Container
         maxWidth="md"
         sx={{
@@ -102,8 +102,8 @@ const Users = () => {
           right: 10,
           left: '18%',
           width: '100%',
-          pt: 6,
-          pb: 6,
+          pt: 2,
+          pb: 2,
           zIndex: 1,
           boxShadow: 3,
           borderRadius: 4,

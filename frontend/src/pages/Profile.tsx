@@ -132,7 +132,7 @@ export default function Profile() {
 
 
   return (
-    <Container maxWidth="sm" sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Container maxWidth="sm" sx={{marginBottom: '80px',marginTop:'80px'}}>
       <CssBaseline />
       <Paper variant="outlined" sx={{ p: 2, width: '100%' }}>
         <Grid container spacing={1}>

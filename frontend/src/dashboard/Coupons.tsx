@@ -177,7 +177,7 @@ const Coupons = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ width: '50%', minHeight: '50vh', display: 'flex', flexDirection: 'column',marginTop: '20px' }}>
       <Container
         maxWidth="md"
         sx={{
@@ -186,17 +186,16 @@ const Coupons = () => {
           right: 10,
           left: '18%',
           width: '100%',
-          pt: 6,
-          pb: 6,
+          pt: 2,
+          pb: 2,
           zIndex: 1,
           boxShadow: 3,
           borderRadius: 4,
           flex: 'full',
           paddingTop: '20px',
-          maxHeight: 590
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Coupons</Typography>
         </Box>
         <Grid container spacing={2} sx={{ mt: 0 }}>
@@ -272,7 +271,7 @@ const Coupons = () => {
           </Grid>
         </Grid>
 
-        <Paper sx={{ maxHeight: 150, overflow: 'auto', mt: 2 }}>
+        <Paper sx={{  mt: 2 }}>
           <Table size="small">
             <TableHead>
               <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
