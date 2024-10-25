@@ -177,7 +177,7 @@ const Coupons = () => {
   };
 
   return (
-    <Box sx={{ width: '50%', minHeight: '50vh', display: 'flex', flexDirection: 'column',marginTop: '20px' }}>
+    <Box sx={{  display: 'flex', flexDirection: 'column',marginTop: '20px' }}>
       <Container
         maxWidth="md"
         sx={{
@@ -275,6 +275,7 @@ const Coupons = () => {
           <Table size="small">
             <TableHead>
               <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+              <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Sr No</TableCell>
                 <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Code</TableCell>
                 <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Description</TableCell>
                 <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Discount Type</TableCell>
@@ -287,6 +288,7 @@ const Coupons = () => {
             <TableBody>
               {coupons.length > 0 && coupons.map((coupon, index) => (
                 <TableRow key={index}>
+                  <TableCell sx={{ width: 150, px: 0.5 }}>{index + 1}</TableCell>
                   <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.code}</TableCell>
                   <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.description}</TableCell>
                   <TableCell sx={{ width: 100, px: 0.5 }}>{coupon.discountType}</TableCell>

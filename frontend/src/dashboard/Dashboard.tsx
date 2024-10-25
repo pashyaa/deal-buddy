@@ -4,6 +4,7 @@ import Users from './Users';
 import MenuBar from '../components/MenuBar';
 import Coupons from './Coupons';
 import MyAppBar from '../components/MyAppBar';
+import Category from '../dashboard/Category'
 import { Box, Grid, Container, AppBar, Toolbar } from '@mui/material';
 import { useState, useEffect } from 'react';
 
@@ -37,6 +38,7 @@ const Dashboard = () => {
           <MyAppBar />
           <Routes>
             <Route path='/dashboard' element={<Users/>} />
+            <Route path='/dashboard/category' element={<Category/>} />
             <Route path="/dashboard/coupons" element={<Coupons />} />
             <Route path="/dashboard/users" element={<Users/>} />
           </Routes>

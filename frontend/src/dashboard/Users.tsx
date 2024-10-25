@@ -93,7 +93,7 @@ const Users = () => {
 
 
   return (
-    <Box sx={{ width: '50%', minHeight: '50vh', display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
+    <Box sx={{  display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
       <Container
         maxWidth="md"
         sx={{
@@ -119,6 +119,7 @@ const Users = () => {
           <Table size="small">
             <TableHead>
               <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+                <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', width: 150, px: 1, fontWeight: 'bold' }}>Sr No</TableCell>
                 <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', width: 150, px: 1, fontWeight: 'bold' }}>First Name</TableCell>
                 <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', width: 100, px: 1, fontWeight: 'bold' }}>Last Name</TableCell>
                 <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', width: 150, px: 1, fontWeight: 'bold' }}>Email</TableCell>
@@ -128,8 +129,9 @@ const Users = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map(user => (
+            {users.map((user, index) => (
                 <TableRow key={user.id}>
+                   <TableCell sx={{ width: 150, px: 1, height: 50 }}>{index + 1}</TableCell>
                   <TableCell sx={{ width: 150, px: 1, height: 50 }}>{user.firstName}</TableCell>
                   <TableCell sx={{ width: 100, px: 1, height: 50 }}>{user.lastName}</TableCell>
                   <TableCell sx={{ width: 150, px: 1, height: 50 }}>{user.email}</TableCell>

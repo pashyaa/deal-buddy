@@ -11,6 +11,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { NavLink } from 'react-router-dom';
 
 
 const MenuBar: React.FC<{ navigation?: any[] }> = ({ navigation = [] }) => {
@@ -49,8 +50,10 @@ const MenuBar: React.FC<{ navigation?: any[] }> = ({ navigation = [] }) => {
         <Divider />
         <List>
           {navigation.map((item, index) => (
+            
             <ListItem key={item.title} disablePadding>
-              <ListItemButton component="a" href={item.link}>
+              <ListItemButton component={NavLink}
+                to={item.link}>
                 <ListItemText primary={item.title} />
               </ListItemButton>
             </ListItem>

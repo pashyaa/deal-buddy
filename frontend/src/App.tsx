@@ -10,6 +10,7 @@ import Users from './dashboard/Users';
 import Coupons from './dashboard/Coupons';
 import Vouchers from './dashboard/Vouchers';
 import Dashboard from './dashboard/Dashboard';
+import Category from './dashboard/Category'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -28,6 +29,7 @@ const App = () => {
 
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/*" element={<Dashboard />}>
+            <Route path= "category" element={<Category/>} />
             <Route path="users" element={<Users />}/>
             <Route path="coupons" element={ <Coupons />}/>
           </Route>

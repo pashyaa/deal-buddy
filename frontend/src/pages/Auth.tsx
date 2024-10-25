@@ -90,7 +90,7 @@ export default function NotificationsSignInPageError() {
     return <Navigate to="/dashboard" replace />;
   }
   return (
-    <Container maxWidth="sm" sx={{  minHeight: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
+    <Container maxWidth="sm" sx={{  minHeight: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <CssBaseline />
       <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#F5F5DC' }}>
         <AppProvider theme={theme}>

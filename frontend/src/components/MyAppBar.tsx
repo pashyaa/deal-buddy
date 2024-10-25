@@ -12,8 +12,10 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import Users from '../dashboard/Users';
 import Coupons from '../dashboard/Coupons';
+import Category from '../dashboard/Category'
 
 const NAVIGATION = [
+  { title: 'Category', link: '/dashboard/category' },
   { title: 'Coupons', link: '/dashboard/coupons' },
   { title: 'Users', link: '/dashboard/users' },
 ];
@@ -92,6 +94,7 @@ export default function ButtonAppBar() {
       </AppBar>
       <MenuBar navigation={NAVIGATION} />
       <Routes>
+        <Route path='/dashboard/category' element={<Category/>} />
         <Route path="/dashboard/coupons" element={<Coupons />} />
         <Route path="/dashboard/users" element={<Users />} />
       </Routes>
