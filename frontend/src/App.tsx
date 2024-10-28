@@ -11,7 +11,9 @@ import Coupons from './dashboard/Coupons';
 import Vouchers from './dashboard/Vouchers';
 import Dashboard from './dashboard/Dashboard';
 import Category from './dashboard/Category'
+import StoresPage from './dashboard/Stores';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
 
 
 
@@ -31,6 +33,7 @@ const App = () => {
           <Route path="/dashboard/*" element={<Dashboard />}>
             <Route path= "category" element={<Category/>} />
             <Route path="users" element={<Users />}/>
+            <Route path="stores" element={<StoresPage />}/>
             <Route path="coupons" element={ <Coupons />}/>
           </Route>
         </Route>
