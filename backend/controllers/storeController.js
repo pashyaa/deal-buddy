@@ -3,7 +3,9 @@ const Store = require('../models/Store');
 // Create a new store
 exports.createStore = async (req, res) => {
     try {
-        const store = await Store.create(req.body);
+        const { name } = req.body;
+        const image = req.file ? req.file.buffer : null; 
+        const store = await Store.create({ name, image });
         res.status(201).json(store);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -14,11 +16,16 @@ exports.createStore = async (req, res) => {
 exports.getStores = async (req, res) => {
     try {
         const stores = await Store.findAll();
-        res.status(200).json(stores);
+        const storesWithImages = stores.map(store => ({
+            ...store.toJSON(),
+            image: store.image ? `data:image/png;base64,${store.image.toString('base64')}` : null
+        }));
+        res.status(200).json(storesWithImages);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
+
 
 // Get a store by ID
 exports.getStoreById = async (req, res) => {
@@ -36,7 +43,9 @@ exports.getStoreById = async (req, res) => {
 // Update a store
 exports.updateStore = async (req, res) => {
     try {
-        const [updated] = await Store.update(req.body, {
+        const { name } = req.body;
+        const image = req.file ? req.file.buffer : null; 
+        const [updated] = await Store.update({ name, image }, {
             where: { id: req.params.id }
         });
         if (!updated) {
@@ -47,7 +56,6 @@ exports.updateStore = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
-
 // Delete a store
 exports.deleteStore = async (req, res) => {
     try {

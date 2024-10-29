@@ -9,7 +9,7 @@ const sequelize = require('./config/database');
 
 
 // Sync database
-sequelize.sync();
+sequelize.sync({ alter: true });
 
 const app = express();
 app.use(cors());

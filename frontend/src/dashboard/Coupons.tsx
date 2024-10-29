@@ -14,47 +14,87 @@ interface Coupon {
   discountValue: string;
   expiryDate: string;
   status: string;
+  categoryId?: string;
+  storeId?: string;
+}
+interface Category {
+  id: number;
+  name: string;
 }
 
+interface Store {
+  id: number;
+  name: string;
+}
 const Coupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
   const [couponData, setCouponData] = useState<Omit<Coupon, 'status'>>({
+
     code: '',
     description: '',
     discountType: 'Percentage',
     discountValue: '',
-    expiryDate: ''
+    expiryDate: '',
+    categoryId: '',
+    storeId: '',
   });
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [couponToDelete, setCouponToDelete] = useState<number | undefined>(undefined);
   const [currentCouponId, setCurrentCouponId] = useState<number | undefined>(undefined);
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`);
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchStores = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`);
+      if (!response.ok) throw new Error('Failed to fetch stores');
+      const data = await response.json();
+      setStores(data);
+    } catch (error) {
+      console.error('Error fetching stores:', error);
+    }
+  };
+
   const fetchCoupons = async () => {
     try {
       console.log('API URL:', process.env.REACT_APP_API_URL);
-      
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch coupons: ${errorText}`);
       }
-  
+
       const data = await response.json();
       setCoupons(data);
     } catch (error: any) {
       console.error('Error fetching coupons:', error.message);
     }
   };
-  
+
 
   useEffect(() => {
+    fetchCategories();
+    fetchStores();
     fetchCoupons();
   }, []);
 
@@ -136,6 +176,8 @@ const Coupons = () => {
       discountType: coupon.discountType,
       discountValue: coupon.discountValue,
       expiryDate: coupon.expiryDate,
+      categoryId: coupon.categoryId,
+      storeId: coupon.storeId,
     });
     setIsEditing(true);
     setCurrentCouponId(coupon.id);
@@ -177,7 +219,7 @@ const Coupons = () => {
   };
 
   return (
-    <Box sx={{  display: 'flex', flexDirection: 'column',marginTop: '20px' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
       <Container
         maxWidth="md"
         sx={{
@@ -199,7 +241,6 @@ const Coupons = () => {
           <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Coupons</Typography>
         </Box>
         <Grid container spacing={2} sx={{ mt: 0 }}>
-
           <Grid item xs={4}>
             <TextField
               size="small"
@@ -265,17 +306,50 @@ const Coupons = () => {
             />
           </Grid>
           <Grid item xs={4}>
+            <FormControl fullWidth required size="small">
+              <InputLabel shrink>Category</InputLabel>
+              <Select
+                name="categoryId"
+                value={couponData.categoryId || ''}
+                onChange={handleSelectChange}
+                label="Category"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth required size="small">
+              <InputLabel shrink>Store</InputLabel>
+              <Select
+                name="storeId"
+                value={couponData.storeId || ''}
+                onChange={handleSelectChange}
+                label="Store"
+              >
+                {stores.map((store) => (
+                  <MenuItem key={store.id} value={store.id}>
+                    {store.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
             <Button variant="contained" color="primary" onClick={handleButtonClick}>
               {isEditing ? 'Update Coupon' : 'Add Coupon'}
             </Button>
           </Grid>
         </Grid>
-
-        <Paper sx={{  mt: 2 }}>
+        <Paper sx={{ mt: 2 }}>
           <Table size="small">
             <TableHead>
               <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
-              <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Sr No</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Sr No</TableCell>
                 <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Code</TableCell>
                 <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Description</TableCell>
                 <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Discount Type</TableCell>
@@ -288,7 +362,7 @@ const Coupons = () => {
             <TableBody>
               {coupons.length > 0 && coupons.map((coupon, index) => (
                 <TableRow key={index}>
-                  <TableCell sx={{ width: 150, px: 0.5 }}>{index + 1}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{index + 1}</TableCell>
                   <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.code}</TableCell>
                   <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.description}</TableCell>
                   <TableCell sx={{ width: 100, px: 0.5 }}>{coupon.discountType}</TableCell>

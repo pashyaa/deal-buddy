@@ -25,7 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 interface Store {
   id?: number;
   name: string;
-  image?: string;
+  image?: string; 
 }
 
 const StoresPage: React.FC = () => {
@@ -40,13 +40,14 @@ const StoresPage: React.FC = () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`);
       if (!response.ok) throw new Error('Failed to fetch stores');
-      
+
       const data = await response.json();
       setStores(data);
     } catch (error) {
       console.error('Error fetching stores:', error);
     }
   };
+
 
   useEffect(() => {
     fetchStores();
@@ -56,17 +57,29 @@ const StoresPage: React.FC = () => {
     setStoreData({ ...storeData, name: e.target.value });
   };
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleAddStore = async () => {
     try {
+      const formData = new FormData();
+      formData.append('name', storeData.name);
+      if (image) {
+        formData.append('image', image);
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(storeData),
+        body: formData,
       });
       if (!response.ok) throw new Error('Failed to add store');
 
       await fetchStores();
       setStoreData({ name: '' });
+      setImage(null); // Reset image state
     } catch (error) {
       console.error('Error adding store:', error);
     }
@@ -74,15 +87,21 @@ const StoresPage: React.FC = () => {
 
   const handleEditStore = async (id: number) => {
     try {
+      const formData = new FormData();
+      formData.append('name', storeData.name);
+      if (image) {
+        formData.append('image', image);
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stores/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(storeData),
+        body: formData,
       });
       if (!response.ok) throw new Error('Failed to update store');
 
       await fetchStores();
       setStoreData({ name: '' });
+      setImage(null); // Reset image state
       setEditId(undefined);
     } catch (error) {
       console.error('Error updating store:', error);
@@ -110,10 +129,15 @@ const StoresPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
-      <Container maxWidth="md" sx={{ position: 'fixed', top: 100, width: '100%', pt: 2, pb: 2, boxShadow: 3, borderRadius: 4 }}>
-        <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Stores</Typography>
+      <Container maxWidth="md" sx={{
+        position: 'fixed', top: 100, right: 10, left: '18%', width: '100%',
+        pt: 2, pb: 2, zIndex: 1, boxShadow: 3, borderRadius: 4
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Stores</Typography>
+        </Box>
         <Grid container spacing={2}>
-          <Grid item xs={8}>
+          <Grid item xs={6}>
             <TextField
               label="Store Name"
               value={storeData.name}
@@ -123,47 +147,62 @@ const StoresPage: React.FC = () => {
               required
             />
           </Grid>
-          <Grid item xs={4}>
-            <Button variant="contained" color="primary" onClick={handleButtonClick} fullWidth>
-              {editId ? 'Update Store' : 'Add Store'}
+          <Grid item xs={6}>
+            <Button variant="outlined" component="label" fullWidth>
+              Upload Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="primary" onClick={handleButtonClick}>
+              {editId !== undefined ? 'Update Store' : 'Add Store'}
             </Button>
           </Grid>
         </Grid>
 
         <Paper sx={{ mt: 2 }}>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Sr No</TableCell>
-                  <TableCell>Store Name</TableCell>
-                  <TableCell>Actions</TableCell>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Sr No</TableCell>
+                <TableCell>Store Name</TableCell>
+                <TableCell>Image</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {stores.map((store, index) => (
+                <TableRow key={store.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{store.name}</TableCell>
+                  <TableCell>
+                    {store.image && (
+                      <img src={store.image} alt={store.name} width="30" height="30" style={{ borderRadius: '4px' }} />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton aria-label="edit" onClick={() => { setStoreData({ name: store.name }); setEditId(store.id); }}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => {
+                        setStoreToDelete(store.id);
+                        setDialogOpen(true);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {stores.map((store, index) => (
-                  <TableRow key={store.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{store.name}</TableCell>
-                    <TableCell>
-                      <IconButton aria-label="edit" onClick={() => { setStoreData({ name: store.name }); setEditId(store.id); }}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => {
-                          setStoreToDelete(store.id);
-                          setDialogOpen(true);
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              ))}
+            </TableBody>
+          </Table>
         </Paper>
 
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
