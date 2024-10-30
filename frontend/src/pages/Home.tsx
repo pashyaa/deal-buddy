@@ -1,24 +1,99 @@
-import React from 'react';
-import { Box, Typography, Grid, Button, Container } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { AppBar, Toolbar, Box, Typography, Grid, Button,Container } from '@mui/material';
 import featureImage1 from '../assets/images/placeholder-1.png';
 import featureImage2 from '../assets/images/placeholder-2.png';
 import featureImage3 from '../assets/images/placeholder-3.png';
 
 const Home: React.FC = () => {
+  const [categories, setCategories] = useState<string[]>([]);
+  const [stores, setStores] = useState<{ name: string; image: string }[]>([]);
+  
+
+  // Fetch categories from the database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`);
+      const data = await response.json();
+      setCategories(data.map((category: any) => category.name)); 
+    };
+
+    const fetchStores = async () => {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`);
+      const data = await response.json();
+      setStores(data.map((store: any) => ({ name: store.name, image: store.image }))); 
+    };
+
+    fetchCategories();
+    fetchStores();
+  }, []);
+
   return (
     <div>
       {/* Hero Section */}
-      <Box sx={{ bgcolor: '#f5f5f5', py: 8, textAlign: 'center' }}>
-        <Typography variant="h2" gutterBottom>
-          Welcome to DealBuddy
-        </Typography>
-        <Typography variant="h5" paragraph>
-          Find the best deals, coupons, and offers on online shopping!
-        </Typography>
-        <Button variant="contained" color="primary" size="large">
-          Get Started
-        </Button>
+      
+      {/* Navigation Bar */}
+      <AppBar position="static" color="default" sx={{ mt: 2, bgcolor: '#f8f8f8' }}>
+    {/* Categories Section */}
+    <Toolbar>
+      <Typography variant="h6" sx={{ mr: 2 }}>
+        Categories:
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        {categories.map((category, index) => (
+          <Typography key={index} variant="body1">
+            {category}
+          </Typography>
+        ))}
       </Box>
+    </Toolbar>
+
+    {/* Stores Section */}
+    <Toolbar>
+      <Typography variant="h6" sx={{ mr: 2}}>
+        Stores:
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        {stores.map((store, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: 'relative',
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              cursor: 'pointer',
+              '&:hover .store-name': { display: 'block' },
+            }}
+          >
+            {/* Store Image */}
+            <img
+              src={store.image}
+              alt={store.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+
+            {/* Store Name (displayed on hover) */}
+            <Typography
+              className="store-name"
+              variant="caption"
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                width: '100%',
+                bgcolor: 'rgba(0, 0, 0, 0.6)',
+                color: '#fff',
+                textAlign: 'center',
+                display: 'none',
+              }}
+            >
+              {store.name}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </Toolbar>
+  </AppBar>
 
       {/* Feature Section */}
       <Container sx={{ py: 6 }}>

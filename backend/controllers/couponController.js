@@ -1,4 +1,6 @@
 const Coupon = require('../models/Coupon');
+const Category = require('../models/Category');
+const Store = require('../models/Store');
 
 // Create new coupon
 exports.createCoupon = async (req, res) => {
@@ -13,13 +15,17 @@ exports.createCoupon = async (req, res) => {
 // Get all coupons
 exports.getCoupons = async (req, res) => {
     try {
-        const coupons = await Coupon.findAll();
+        const coupons = await Coupon.findAll({
+            include: [
+                { model: Category, attributes: ['name'] },
+                { model: Store, attributes: ['name'] }
+            ]
+        });
         res.status(200).json(coupons);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
-
 // Get coupon by id
 exports.getCouponById = async (req, res) => {
     try {

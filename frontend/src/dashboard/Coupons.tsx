@@ -16,7 +16,10 @@ interface Coupon {
   status: string;
   categoryId?: string;
   storeId?: string;
+  categoryName?: string;
+  storeName?: string;
 }
+
 interface Category {
   id: number;
   name: string;
@@ -49,55 +52,71 @@ const Coupons = () => {
   const fetchCategories = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`);
-      if (!response.ok) throw new Error('Failed to fetch categories');
       const data = await response.json();
+      console.log("Categories:", data); // Log categories data
       setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      if (error instanceof Error) {
+        console.error('Error fetching categories:', error.message);
+      } else {
+        console.error('Unknown error fetching categories:', error);
+      }
     }
   };
-
+  
   const fetchStores = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`);
-      if (!response.ok) throw new Error('Failed to fetch stores');
       const data = await response.json();
+      console.log("Stores:", data); // Log stores data
       setStores(data);
     } catch (error) {
-      console.error('Error fetching stores:', error);
+      if (error instanceof Error) {
+        console.error('Error fetching stores:', error.message);
+      } else {
+        console.error('Unknown error fetching stores:', error);
+      }
     }
   };
-
+  
   const fetchCoupons = async () => {
     try {
-      console.log('API URL:', process.env.REACT_APP_API_URL);
-
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to fetch coupons: ${errorText}`);
-      }
-
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`);
       const data = await response.json();
-      setCoupons(data);
-    } catch (error: any) {
-      console.error('Error fetching coupons:', error.message);
+  
+      const updatedCoupons = data.map((coupon: any) => {
+        const category = categories.find((cat) => cat.id === coupon.categoryId);
+        const store = stores.find((store) => store.id === coupon.storeId);
+  
+        return {
+          ...coupon,
+          categoryName: category ? category.name : 'Unknown',
+          storeName: store ? store.name : 'Unknown',
+        };
+      });
+  
+      setCoupons(updatedCoupons);
+    } catch (error) {
+      console.error('Error fetching coupons:', error);
     }
   };
-
+  
 
   useEffect(() => {
-    fetchCategories();
-    fetchStores();
-    fetchCoupons();
+    const fetchData = async () => {
+      await fetchCategories();
+      await fetchStores();
+      await fetchCoupons();
+    };
+    fetchData();
   }, []);
 
+  useEffect(() => {
+    if (categories.length > 0 && stores.length > 0) {
+      fetchCoupons();
+    }
+  }, [categories, stores]);
+  
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCouponData({ ...couponData, [name]: value });
@@ -111,63 +130,55 @@ const Coupons = () => {
   const handleAddCoupon = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons`, {
-
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...couponData, status: 'Active' }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to add coupon');
-      }
+      if (!response.ok) throw new Error('Failed to add coupon');
 
-      await fetchCoupons();
-      setCouponData({ code: '', description: '', discountType: 'Percentage', discountValue: '', expiryDate: '' });
+      await fetchCoupons(); // Refresh coupons after adding
+      setCouponData({
+        code: '',
+        description: '',
+        discountType: 'Percentage',
+        discountValue: '',
+        expiryDate: '',
+        categoryId: '',
+        storeId: '',
+      });
     } catch (error) {
       console.error('Error adding coupon:', error);
     }
   };
 
+
   const handleEditCoupon = async (id: number) => {
-    if (!couponData.code || !couponData.description || !couponData.discountValue || !couponData.expiryDate) {
-      console.error('All fields must be filled before updating the coupon.');
-      return;
-    }
-
-
-    const updatedCouponData = {
-      id,
-      code: couponData.code || null,
-      description: couponData.description || null,
-      discountType: couponData.discountType || null,
-      discountValue: couponData.discountValue ? Number(couponData.discountValue) : null,
-      expiryDate: couponData.expiryDate ? new Date(couponData.expiryDate).toISOString().split('T')[0] : null,
-    };
-
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/coupons/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedCouponData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(couponData),
       });
+      if (!response.ok) throw new Error('Failed to update coupon');
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update coupon: ${errorText}`);
-      }
-
-      await fetchCoupons();
-      setCouponData({ code: '', description: '', discountType: 'Percentage', discountValue: '', expiryDate: '' });
+      await fetchCoupons(); 
+      setCouponData({
+        code: '',
+        description: '',
+        discountType: 'Percentage',
+        discountValue: '',
+        expiryDate: '',
+        categoryId: '',
+        storeId: '',
+      });
       setIsEditing(false);
       setCurrentCouponId(undefined);
     } catch (error) {
       console.error('Error updating coupon:', error);
     }
   };
+
 
   const handleSelectCouponForEdit = (coupon: Coupon) => {
     setCouponData({
@@ -306,36 +317,18 @@ const Coupons = () => {
             />
           </Grid>
           <Grid item xs={4}>
-            <FormControl fullWidth required size="small">
+          <FormControl fullWidth required>
               <InputLabel shrink>Category</InputLabel>
-              <Select
-                name="categoryId"
-                value={couponData.categoryId || ''}
-                onChange={handleSelectChange}
-                label="Category"
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
+              <Select name="categoryId" value={couponData.categoryId || ''} onChange={handleSelectChange}>
+                {categories.map((category) => <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <FormControl fullWidth required size="small">
+          <FormControl fullWidth required>
               <InputLabel shrink>Store</InputLabel>
-              <Select
-                name="storeId"
-                value={couponData.storeId || ''}
-                onChange={handleSelectChange}
-                label="Store"
-              >
-                {stores.map((store) => (
-                  <MenuItem key={store.id} value={store.id}>
-                    {store.name}
-                  </MenuItem>
-                ))}
+              <Select name="storeId" value={couponData.storeId || ''} onChange={handleSelectChange}>
+                {stores.map((store) => <MenuItem key={store.id} value={store.id}>{store.name}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>
@@ -351,10 +344,11 @@ const Coupons = () => {
               <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Sr No</TableCell>
                 <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Code</TableCell>
-                <TableCell sx={{ width: 150, px: 1, fontWeight: 'bold' }}>Description</TableCell>
-                <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Discount Type</TableCell>
-                <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Discount Value</TableCell>
-                <TableCell sx={{ width: 100, px: 1, fontWeight: 'bold' }}>Expiry Date</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Category</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Store</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Discount Type</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Discount Value</TableCell>
+                <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Expiry Date</TableCell>
                 <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Status</TableCell>
                 <TableCell sx={{ width: 80, px: 1, fontWeight: 'bold' }}>Actions</TableCell>
               </TableRow>
@@ -364,10 +358,11 @@ const Coupons = () => {
                 <TableRow key={index}>
                   <TableCell sx={{ width: 80, px: 0.5 }}>{index + 1}</TableCell>
                   <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.code}</TableCell>
-                  <TableCell sx={{ width: 150, px: 0.5 }}>{coupon.description}</TableCell>
-                  <TableCell sx={{ width: 100, px: 0.5 }}>{coupon.discountType}</TableCell>
-                  <TableCell sx={{ width: 100, px: 0.5 }}>{coupon.discountValue}</TableCell>
-                  <TableCell sx={{ width: 100, px: 0.5 }}>{formatExpiryDate(coupon.expiryDate)}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.categoryName}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.storeName}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.discountType}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.discountValue}</TableCell>
+                  <TableCell sx={{ width: 80, px: 0.5 }}>{formatExpiryDate(coupon.expiryDate)}</TableCell>
                   <TableCell sx={{ width: 80, px: 0.5 }}>{coupon.status}</TableCell>
                   <TableCell sx={{ width: 60, px: 0.5 }}>
                     <IconButton aria-label="edit" size="small" onClick={() => handleSelectCouponForEdit(coupon)}>
