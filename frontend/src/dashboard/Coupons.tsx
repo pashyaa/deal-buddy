@@ -317,7 +317,7 @@ const Coupons = () => {
             />
           </Grid>
           <Grid item xs={4}>
-          <FormControl fullWidth required>
+          <FormControl fullWidth required size="small">
               <InputLabel shrink>Category</InputLabel>
               <Select name="categoryId" value={couponData.categoryId || ''} onChange={handleSelectChange}>
                 {categories.map((category) => <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>)}
@@ -325,7 +325,7 @@ const Coupons = () => {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-          <FormControl fullWidth required>
+          <FormControl fullWidth required size="small">
               <InputLabel shrink>Store</InputLabel>
               <Select name="storeId" value={couponData.storeId || ''} onChange={handleSelectChange}>
                 {stores.map((store) => <MenuItem key={store.id} value={store.id}>{store.name}</MenuItem>)}

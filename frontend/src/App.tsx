@@ -5,6 +5,8 @@ import Auth from './pages/Auth';
 import Createaccount from './pages/Createaccount';
 import Profile from './pages/Profile'
 import MainLayout from './components/MainLayout';
+import CategoriesPage from './pages/CategoriesPage';
+import StorePage from './pages/StorePage';
 import DashboardLayout from './dashboard/DashboardLayout';
 import Users from './dashboard/Users';
 import Coupons from './dashboard/Coupons';
@@ -26,6 +28,8 @@ const App = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/register" element={<Createaccount />} />
           <Route path="/vouchers" element={<Vouchers />} />
+          <Route path="/home/categories" element={<CategoriesPage />} />
+          <Route path="/home/stores" element={<StorePage />} />
           <Route  path="/profile" element={<Profile />} />
         </Route>
 
