@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, Card, CardContent, CardMedia, CardActionArea } from '@mui/material';
 
 const StorePage: React.FC = () => {
   const [stores, setStores] = useState<{ name: string; image: string }[]>([]);
@@ -15,14 +14,25 @@ const StorePage: React.FC = () => {
   }, []);
 
   return (
-    <Container>
+    <Container maxWidth="lg" sx={{ minHeight: '82vh', paddingTop: '20px', flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>All Stores</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
         {stores.map((store, index) => (
-          <Box key={index} sx={{ textAlign: 'center', width: 100 }}>
-            <img src={store.image} alt={store.name} style={{ width: '100%', borderRadius: '50%' }} />
-            <Typography variant="body1">{store.name}</Typography>
-          </Box>
+          <Card key={index} sx={{ maxWidth: 400 }}>
+            <CardActionArea>
+              <CardMedia
+                component="img"
+                height="140"
+                image={store.image}
+                alt={store.name}
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h6" component="div">
+                  {store.name}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         ))}
       </Box>
     </Container>
