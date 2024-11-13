@@ -1,42 +1,54 @@
 const Category = require('../models/Category');
 
-// Create new category
+// Create new category with optional image
 exports.createCategory = async (req, res) => {
     try {
-        const category = await Category.create(req.body);
+        const { name } = req.body;
+        const image = req.file ? req.file.buffer : null;
+        const category = await Category.create({ name, image });
         res.status(201).json(category);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
 
-// Get all categories
+// Get all categories, with images in base64 format
 exports.getCategories = async (req, res) => {
     try {
         const categories = await Category.findAll();
-        res.status(200).json(categories);
+        const categoriesWithImages = categories.map(category => ({
+            ...category.toJSON(),
+            image: category.image ? `data:image/png;base64,${category.image.toString('base64')}` : null
+        }));
+        res.status(200).json(categoriesWithImages);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
 
-// Get category by ID
+// Get category by ID, with image in base64 format if available
 exports.getCategoryById = async (req, res) => {
     try {
         const category = await Category.findByPk(req.params.id);
         if (!category) {
             return res.status(404).json({ error: 'Category not found' });
         }
-        res.status(200).json(category);
+        const categoryWithImage = {
+            ...category.toJSON(),
+            image: category.image ? `data:image/png;base64,${category.image.toString('base64')}` : null
+        };
+        res.status(200).json(categoryWithImage);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
 
-// Update category
+// Update category with optional new image
 exports.updateCategory = async (req, res) => {
     try {
-        const [updated] = await Category.update(req.body, {
+        const { name } = req.body;
+        const image = req.file ? req.file.buffer : null;
+        const [updated] = await Category.update({ name, image }, {
             where: { id: req.params.id }
         });
         if (!updated) {

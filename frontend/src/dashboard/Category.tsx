@@ -1,15 +1,36 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { 
+  Box, 
+  Button, 
+  Container, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogTitle, 
+  Grid, 
+  IconButton, 
+  Paper, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  TextField, 
+  Typography 
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Category {
   id?: number;
   name: string;
+  image?: string; 
 }
 
 const Category = () => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [image, setImage] = useState<File | null>(null);
   const [categoryData, setCategoryData] = useState<Category>({ name: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -18,9 +39,8 @@ const Category = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`, { method: 'GET' });
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`);
       if (!response.ok) throw new Error('Failed to fetch categories');
-      
       const data = await response.json();
       setCategories(data);
     } catch (error) {
@@ -36,17 +56,27 @@ const Category = () => {
     setCategoryData({ ...categoryData, name: e.target.value });
   };
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleAddCategory = async () => {
     try {
+      const formData = new FormData();
+      formData.append('name', categoryData.name);
+      if (image) formData.append('image', image);
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(categoryData),
+        body: formData,
       });
       if (!response.ok) throw new Error('Failed to add category');
-      
+
       await fetchCategories();
       setCategoryData({ name: '' });
+      setImage(null); // Reset image state
     } catch (error) {
       console.error('Error adding category:', error);
     }
@@ -54,15 +84,19 @@ const Category = () => {
 
   const handleEditCategory = async (id: number) => {
     try {
+      const formData = new FormData();
+      formData.append('name', categoryData.name);
+      if (image) formData.append('image', image);
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/categories/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(categoryData),
+        body: formData,
       });
       if (!response.ok) throw new Error('Failed to update category');
-      
+
       await fetchCategories();
       setCategoryData({ name: '' });
+      setImage(null); // Reset image state
       setIsEditing(false);
       setCurrentCategoryId(undefined);
     } catch (error) {
@@ -74,7 +108,7 @@ const Category = () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/categories/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete category');
-      
+
       await fetchCategories();
     } catch (error) {
       console.error('Error deleting category:', error);
@@ -91,39 +125,37 @@ const Category = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
-      <Container
-        maxWidth="md"
-        sx={{
-          position: 'fixed',
-          top: 100,
-          right: 10,
-          left: '18%',
-          width: '100%',
-          pt: 2,
-          pb: 2,
-          zIndex: 1,
-          boxShadow: 3,
-          borderRadius: 4,
-          paddingTop: '20px',
-        }}
-      >
+      <Container maxWidth="md" sx={{
+        position: 'fixed', top: 100, right: 10, left: '18%', width: '100%',
+        pt: 2, pb: 2, zIndex: 1, boxShadow: 3, borderRadius: 4
+      }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="h4" sx={{ textAlign: 'center', color: '#000000' }}>Categories</Typography>
         </Box>
-        <Grid container spacing={2} sx={{ mt: 0 }}>
-          <Grid item xs={8}>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
             <TextField
-              size="small"
               label="Category Name"
               value={categoryData.name}
               onChange={handleInputChange}
               fullWidth
-              InputLabelProps={{ shrink: true }}
+              size="small"
               required
             />
           </Grid>
-          <Grid item xs={4}>
-            <Button variant="contained" color="primary" onClick={handleButtonClick} fullWidth>
+          <Grid item xs={6}>
+            <Button variant="outlined" component="label" fullWidth>
+              Upload Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="primary" onClick={handleButtonClick}>
               {currentCategoryId ? 'Update Category' : 'Add Category'}
             </Button>
           </Grid>
@@ -133,10 +165,11 @@ const Category = () => {
           <TableContainer>
             <Table size="small">
               <TableHead>
-                <TableRow sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Sr No</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Category Name</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                <TableRow>
+                  <TableCell>Sr No</TableCell>
+                  <TableCell>Category Name</TableCell>
+                  <TableCell>Image</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -145,12 +178,16 @@ const Category = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{category.name}</TableCell>
                     <TableCell>
-                      <IconButton aria-label="edit" size="small" onClick={() => { setIsEditing(true); setCategoryData({ name: category.name }); setCurrentCategoryId(category.id); }}>
+                      {category.image && (
+                        <img src={category.image} alt={category.name} width="30" height="30" style={{ borderRadius: '4px' }} />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton aria-label="edit" onClick={() => { setIsEditing(true); setCategoryData({ name: category.name }); setCurrentCategoryId(category.id); }}>
                         <EditIcon />
                       </IconButton>
                       <IconButton
                         aria-label="delete"
-                        size="small"
                         onClick={() => {
                           setCategoryToDelete(category.id);
                           setDialogOpen(true);
@@ -178,7 +215,9 @@ const Category = () => {
                 setCategoryToDelete(undefined);
               }}
               color="primary"
-            >Delete</Button>
+            >
+              Delete
+            </Button>
           </DialogActions>
         </Dialog>
       </Container>

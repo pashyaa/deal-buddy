@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Box, Typography, Container, Tabs, Tab, Grid, Menu, MenuItem, Divider } from '@mui/material';
+import { AppBar, Toolbar, Box, Typography, Container, Tabs, Tab, Menu, MenuItem, Divider, Card, CardContent, CardMedia, CardActionArea } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import featureImage1 from '../assets/images/placeholder-1.png';
-import featureImage2 from '../assets/images/placeholder-2.png';
-import featureImage3 from '../assets/images/placeholder-3.png';
 
 const Home: React.FC = () => {
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<{ name: string; image: string }[]>([]);
   const [stores, setStores] = useState<{ name: string; image: string }[]>([]);
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -14,15 +11,22 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`);
-      const data = await response.json();
-      setCategories(data.map((category: any) => category.name));
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+        const data = await response.json();
+        setCategories(data.map((category: { name: string; image: string }) => ({ name: category.name, image: category.image })));
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
     };
 
     const fetchStores = async () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`);
       const data = await response.json();
-      setStores(data.map((store: any) => ({ name: store.name, image: store.image })));
+      setStores(data.map((store: { name: string; image: string }) => ({ name: store.name, image: store.image })));
     };
 
     fetchCategories();
@@ -54,7 +58,10 @@ const Home: React.FC = () => {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         {activeTab === 0 && categories.map((category, index) => (
           <MenuItem key={index} onClick={handleClose}>
-            {category}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <img src={category.image} alt={category.name} style={{ width: 30, height: 30, marginRight: 8 }} />
+              <Typography variant="body1">{category.name}</Typography>
+            </Box>
           </MenuItem>
         ))}
         {activeTab === 1 && stores.map((store, index) => (
@@ -81,34 +88,50 @@ const Home: React.FC = () => {
         )}
       </Menu>
 
-      {/* Feature Section */}
-      <Container sx={{ py: 6 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Why Choose DealBuddy?
-        </Typography>
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} sm={6} md={4}>
-            <Box textAlign="center">
-              <img src={featureImage1} alt="Feature 1" style={{ width: '100%' }} />
-              <Typography variant="h6" gutterBottom>Best Deals</Typography>
-              <Typography>Access the most exclusive deals across multiple platforms with ease.</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Box textAlign="center">
-              <img src={featureImage2} alt="Feature 2" style={{ width: '100%' }} />
-              <Typography variant="h6" gutterBottom>Verified Coupons</Typography>
-              <Typography>Get verified and updated coupons, ensuring you always save on purchases.</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Box textAlign="center">
-              <img src={featureImage3} alt="Feature 3" style={{ width: '100%' }} />
-              <Typography variant="h6" gutterBottom>Easy to Use</Typography>
-              <Typography>Our user-friendly interface helps you find deals quickly and efficiently.</Typography>
-            </Box>
-          </Grid>
-        </Grid>
+      {/* Categories Section */}
+      <Container maxWidth="lg" sx={{ minHeight: '82vh', paddingTop: '20px' }}>
+        <Typography variant="h4" gutterBottom>All Categories</Typography>
+        < Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          {categories.map((category, index) => (
+            <Card key={index} sx={{ maxWidth: 400 }}>
+              <CardActionArea onClick={() => alert(`Category: ${category.name}`)}>
+                <CardMedia
+                  component="img"
+                  height="150"
+                  image={category.image}
+                  alt={category.name}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h6" component="div" align="center">
+                    {category.name}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
+        </Box>
+
+        {/* Stores Section */}
+        <Typography variant="h4" gutterBottom sx={{ marginTop: '40px' }}>All Stores</Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          {stores.map((store, index) => (
+            <Card key={index} sx={{ maxWidth: 400 }}>
+              <CardActionArea>
+                <CardMedia
+                  component="img"
+                  height="150"
+                  image={store.image}
+                  alt={store.name}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h6" component="div" align="center">
+                    {store.name}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
+        </Box>
       </Container>
     </div>
   );
