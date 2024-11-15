@@ -3,8 +3,8 @@ import { AppBar, Toolbar, Box, Typography, Container, Tabs, Tab, Menu, MenuItem,
 import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
-  const [categories, setCategories] = useState<{ name: string; image: string }[]>([]);
-  const [stores, setStores] = useState<{ name: string; image: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string; image: string }[]>([]);
+  const [stores, setStores] = useState<{ id: number; name: string; image: string }[]>([]);  
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Home: React.FC = () => {
           throw new Error('Failed to fetch categories');
         }
         const data = await response.json();
-        setCategories(data.map((category: { name: string; image: string }) => ({ name: category.name, image: category.image })));
+        setCategories(data.map((category: {id: number; name: string; image: string }) => ({id: category.id, name: category.name, image: category.image })));
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -26,7 +26,7 @@ const Home: React.FC = () => {
     const fetchStores = async () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stores`);
       const data = await response.json();
-      setStores(data.map((store: { name: string; image: string }) => ({ name: store.name, image: store.image })));
+      setStores(data.map((store: {id: number; name: string; image: string }) => ({ id: store.id, name: store.name, image: store.image })));
     };
 
     fetchCategories();
@@ -43,17 +43,13 @@ const Home: React.FC = () => {
     setActiveTab(null);
   };
 
+const navigateToCoupons = (type: 'category' | 'store', id: number) => {
+  navigate(`/coupons/${type}/${id}`);
+};
+
+
   return (
     <div>
-      <AppBar position="static" color="default" sx={{ bgcolor: '#f8f8f8' }}>
-        <Toolbar>
-          <Tabs value={activeTab} onChange={(e, value) => setActiveTab(value)} aria-label="Category and Store Tabs">
-            <Tab label="Categories" onClick={(e) => handleTabClick(e, 0)} />
-            <Tab label="Stores" onClick={(e) => handleTabClick(e, 1)} />
-          </Tabs>
-        </Toolbar>
-      </AppBar>
-
       {/* Menu for Categories and Stores */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         {activeTab === 0 && categories.map((category, index) => (
@@ -94,7 +90,7 @@ const Home: React.FC = () => {
         < Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           {categories.map((category, index) => (
             <Card key={index} sx={{ maxWidth: 400 }}>
-              <CardActionArea onClick={() => alert(`Category: ${category.name}`)}>
+              <CardActionArea onClick={() => navigateToCoupons('category', category.id)}>
                 <CardMedia
                   component="img"
                   height="150"
@@ -116,7 +112,8 @@ const Home: React.FC = () => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           {stores.map((store, index) => (
             <Card key={index} sx={{ maxWidth: 400 }}>
-              <CardActionArea>
+              <CardActionArea onClick={() => navigateToCoupons('store', store.id)}>
+
                 <CardMedia
                   component="img"
                   height="150"

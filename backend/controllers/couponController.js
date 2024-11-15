@@ -54,6 +54,37 @@ exports.updateCoupon = async (req, res) => {
     }
 };
 
+exports.getCouponsByCategory = async (req, res) => {
+    try {
+        const coupons = await Coupon.findAll({
+            where: { categoryId: req.params.categoryId },
+            include: [
+                { model: Category, attributes: ['name'] },
+                { model: Store, attributes: ['name'] }
+            ]
+        });
+        res.status(200).json(coupons);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// Get coupons by store
+exports.getCouponsByStore = async (req, res) => {
+    try {
+        const coupons = await Coupon.findAll({
+            where: { storeId: req.params.storeId },
+            include: [
+                { model: Category, attributes: ['name'] },
+                { model: Store, attributes: ['name'] }
+            ]
+        });
+        res.status(200).json(coupons);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
 // Delete coupon
 exports.deleteCoupon = async (req, res) => {
     try {
