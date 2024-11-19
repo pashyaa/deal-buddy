@@ -230,13 +230,12 @@ const Coupons = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', mt: '100px'}}>
       <Container
         maxWidth="md"
         sx={{
-          position: 'fixed',
           top: 100,
-          right: 10,
+          right: 100,
           left: '18%',
           width: '100%',
           pt: 2,

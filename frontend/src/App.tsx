@@ -28,8 +28,8 @@ const App = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/register" element={<Createaccount />} />
           <Route path="/vouchers" element={<Vouchers />} />
-          <Route path="/coupons/category/:categoryId" element={<CouponsByCategory />} />
-          <Route path="/coupons/store/:storeId" element={<CouponsByStore />} />
+          <Route path="/category/:categoryId" element={<CouponsByCategory />} />
+          <Route path="/store/:storeId" element={<CouponsByStore />} />
           <Route  path="/profile" element={<Profile />} />
         </Route>
 

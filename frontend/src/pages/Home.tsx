@@ -44,7 +44,7 @@ const Home: React.FC = () => {
   };
 
 const navigateToCoupons = (type: 'category' | 'store', id: number) => {
-  navigate(`/coupons/${type}/${id}`);
+  navigate(`/${type}/${id}`);
 };
 
 
